@@ -30,14 +30,35 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.saveOrUpdatePrenotazione(prenotazioneTo));
     }
 
-    @PutMapping("/annulla/{idPrenotazione}")
-    public ResponseEntity<PrenotazioneTo> annullaPrenotazione(@PathVariable Integer idPrenotazione) {
-        return ResponseEntity.ok(prenotazioneService.annullaPrenotazione(idPrenotazione));
+    @PutMapping("/utente-annulla-prenotazione/{idPrenotazione}")
+    public ResponseEntity<PrenotazioneTo> utenteAnnullaPrenotazione(@PathVariable Integer idPrenotazione) {
+        return ResponseEntity.ok(prenotazioneService.utenteAnnullaPrenotazione(idPrenotazione));
+    }
+
+    @PutMapping("/struttura-annulla-prenotazione/{idPrenotazione}")
+    public ResponseEntity<PrenotazioneTo> strutturaAnnullaPrenotazione(@PathVariable Integer idPrenotazione) {
+        return ResponseEntity.ok(prenotazioneService.strutturaAnnullaPrenotazione(idPrenotazione));
     }
 
     @GetMapping("/cerca-per-id/{idPrenotazione}")
     public ResponseEntity<PrenotazioneTo> cercaPrenotazionePerId(@PathVariable Integer idPrenotazione) {
         return ResponseEntity.ok(prenotazioneService.getPrenotazioneById(idPrenotazione));
+    }
+
+    @GetMapping("/stampa-da-riprogrammare")
+    public ResponseEntity<List<PrenotazioneTo>> stampaPrenotazioniDaRiprogrammare() {
+        return ResponseEntity.ok(
+                prenotazioneService.getPrenotazioniDaRiprogrammare()
+        );
+    }
+
+    @GetMapping("/stampa-da-riprogrammare-per-utente/{idUtente}")
+    public ResponseEntity<List<PrenotazioneTo>> stampaPrenotazioniDaRiprogrammarePerUtente(
+            @PathVariable Integer idUtente) {
+
+        return ResponseEntity.ok(
+                prenotazioneService.getPrenotazioniDaRiprogrammareByUtente(idUtente)
+        );
     }
 
     @GetMapping("/stampa-tutti")

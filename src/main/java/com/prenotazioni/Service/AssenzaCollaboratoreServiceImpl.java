@@ -2,13 +2,17 @@ package com.prenotazioni.Service;
 
 import com.prenotazioni.Dao.AssenzaCollaboratoreRepository;
 import com.prenotazioni.Dao.CollaboratoreRepository;
+import com.prenotazioni.Dao.PrenotazioneRepository;
 import com.prenotazioni.Dto.AssenzaCollaboratoreTo;
+import com.prenotazioni.Enums.StatoPrenotazione;
 import com.prenotazioni.Error.AppError;
 import com.prenotazioni.Error.ServiceException;
 import com.prenotazioni.Mapper.AssenzaCollaboratoreMapper;
 import com.prenotazioni.Po.AssenzaCollaboratorePo;
 import com.prenotazioni.Po.CollaboratorePo;
+import com.prenotazioni.Po.PrenotazionePo;
 import com.prenotazioni.Response.EsitoResponse;
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +26,16 @@ public class AssenzaCollaboratoreServiceImpl implements AssenzaCollaboratoreServ
     private final AssenzaCollaboratoreRepository assenzaCollaboratoreRepository;
     private final CollaboratoreRepository collaboratoreRepository;
     private final AssenzaCollaboratoreMapper assenzaCollaboratoreMapper;
+    private final PrenotazioneRepository prenotazioneRepository;
 
     public AssenzaCollaboratoreServiceImpl(AssenzaCollaboratoreRepository assenzaCollaboratoreRepository,
                                            CollaboratoreRepository collaboratoreRepository,
-                                           AssenzaCollaboratoreMapper assenzaCollaboratoreMapper) {
+                                           AssenzaCollaboratoreMapper assenzaCollaboratoreMapper,
+                                           PrenotazioneRepository prenotazioneRepository) {
         this.assenzaCollaboratoreRepository = assenzaCollaboratoreRepository;
         this.collaboratoreRepository = collaboratoreRepository;
         this.assenzaCollaboratoreMapper = assenzaCollaboratoreMapper;
+        this.prenotazioneRepository = prenotazioneRepository;
     }
 
     @Override
@@ -75,6 +82,26 @@ public class AssenzaCollaboratoreServiceImpl implements AssenzaCollaboratoreServ
 
                 assenzaCollaboratorePo = assenzaCollaboratoreRepository.save(assenzaCollaboratorePo);
 
+
+                if (Boolean.TRUE.equals(assenzaCollaboratorePo.getAttivoAssenzaCollaboratore())) {
+
+                    List<PrenotazionePo> prenotazioniColpite =
+                            prenotazioneRepository.findPrenotazioniConfermateCheHannoAssenza(
+                                    assenzaCollaboratorePo.getCollaboratorePo().getIdCollaboratore(),
+                                    assenzaCollaboratorePo.getDataInizioAssenza(),
+                                    assenzaCollaboratorePo.getDataFineAssenza(),
+                                    assenzaCollaboratorePo.getOraInizioAssenza(),
+                                    assenzaCollaboratorePo.getOraFineAssenza()
+                            );
+
+                    for (PrenotazionePo prenotazionePo : prenotazioniColpite) {
+                        prenotazionePo.setStatoPrenotazione(StatoPrenotazione.DA_RIPROGRAMMARE);
+                        prenotazionePo.setDataModificaPrenotazione(LocalDateTime.now());
+                    }
+
+                    prenotazioneRepository.saveAll(prenotazioniColpite);
+                }
+
                 return assenzaCollaboratoreMapper.toDto(assenzaCollaboratorePo);
 
             } catch (ServiceException e) {
@@ -107,6 +134,24 @@ public class AssenzaCollaboratoreServiceImpl implements AssenzaCollaboratoreServ
             assenzaCollaboratorePo.setDataModificaAssenzaCollaboratore(LocalDateTime.now());
 
             assenzaCollaboratorePo = assenzaCollaboratoreRepository.save(assenzaCollaboratorePo);
+            if (Boolean.TRUE.equals(assenzaCollaboratorePo.getAttivoAssenzaCollaboratore())) {
+
+                List<PrenotazionePo> prenotazioniColpite =
+                        prenotazioneRepository.findPrenotazioniConfermateCheHannoAssenza(
+                                assenzaCollaboratorePo.getCollaboratorePo().getIdCollaboratore(),
+                                assenzaCollaboratorePo.getDataInizioAssenza(),
+                                assenzaCollaboratorePo.getDataFineAssenza(),
+                                assenzaCollaboratorePo.getOraInizioAssenza(),
+                                assenzaCollaboratorePo.getOraFineAssenza()
+                        );
+
+                for (PrenotazionePo prenotazionePo : prenotazioniColpite) {
+                    prenotazionePo.setStatoPrenotazione(StatoPrenotazione.DA_RIPROGRAMMARE);
+                    prenotazionePo.setDataModificaPrenotazione(LocalDateTime.now());
+                }
+
+                prenotazioneRepository.saveAll(prenotazioniColpite);
+            }
 
             return assenzaCollaboratoreMapper.toDto(assenzaCollaboratorePo);
 

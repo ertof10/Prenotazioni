@@ -1,5 +1,6 @@
 package com.prenotazioni.Dao;
 
+import com.prenotazioni.Enums.StatoPrenotazione;
 import com.prenotazioni.Po.PrenotazionePo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -61,9 +62,47 @@ public interface PrenotazioneRepository extends JpaRepository<PrenotazionePo, In
             @Param("dataPrenotazione") LocalDate dataPrenotazione
     );
 
+    @Query("SELECT prenotazionePo " +
+            "FROM PrenotazionePo prenotazionePo " +
+            "WHERE prenotazionePo.collaboratorePo.idCollaboratore = :idCollaboratore " +
+            "AND prenotazionePo.statoPrenotazione = com.prenotazioni.Enums.StatoPrenotazione.CONFERMATA " +
+            "AND prenotazionePo.dataPrenotazione BETWEEN :dataInizioAssenza AND :dataFineAssenza " +
+            "AND prenotazionePo.oraInizioPrenotazione < :oraFineAssenza " +
+            "AND prenotazionePo.oraFinePrenotazione > :oraInizioAssenza")
+    List<PrenotazionePo> findPrenotazioniConfermateCheHannoAssenza(
+            @Param("idCollaboratore") Integer idCollaboratore,
+            @Param("dataInizioAssenza") LocalDate dataInizioAssenza,
+            @Param("dataFineAssenza") LocalDate dataFineAssenza,
+            @Param("oraInizioAssenza") LocalTime oraInizioAssenza,
+            @Param("oraFineAssenza") LocalTime oraFineAssenza
+    );
+
+    @Query("SELECT COUNT(prenotazionePo) " +
+            "FROM PrenotazionePo prenotazionePo " +
+            "WHERE (:idPrenotazione IS NULL OR prenotazionePo.idPrenotazione <> :idPrenotazione) " +
+            "AND prenotazionePo.servizioPo.idServizio = :idServizio " +
+            "AND prenotazionePo.dataPrenotazione = :dataPrenotazione " +
+            "AND prenotazionePo.statoPrenotazione = com.prenotazioni.Enums.StatoPrenotazione.CONFERMATA " +
+            "AND prenotazionePo.oraInizioPrenotazione < :oraFinePrenotazione " +
+            "AND prenotazionePo.oraFinePrenotazione > :oraInizioPrenotazione")
+    Long countPrenotazioniConfermateServizioAPosti(
+            @Param("idPrenotazione") Integer idPrenotazione,
+            @Param("idServizio") Integer idServizio,
+            @Param("dataPrenotazione") LocalDate dataPrenotazione,
+            @Param("oraInizioPrenotazione") LocalTime oraInizioPrenotazione,
+            @Param("oraFinePrenotazione") LocalTime oraFinePrenotazione
+    );
+
     boolean existsByUtentePo_IdUtente(Integer idUtente);
 
     boolean existsByCollaboratorePo_IdCollaboratore(Integer idCollaboratore);
 
     boolean existsByServizioPo_IdServizio(Integer idServizio);
+
+    List<PrenotazionePo> findByStatoPrenotazione(StatoPrenotazione statoPrenotazione);
+
+    List<PrenotazionePo> findByUtentePo_IdUtenteAndStatoPrenotazione(
+            Integer idUtente,
+            StatoPrenotazione statoPrenotazione
+    );
 }

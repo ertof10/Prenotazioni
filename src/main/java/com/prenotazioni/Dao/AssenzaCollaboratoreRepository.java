@@ -50,4 +50,6 @@ public interface AssenzaCollaboratoreRepository extends JpaRepository<AssenzaCol
     );
 
 
+
+
 }

@@ -49,13 +49,13 @@ public enum AppError {
     COLLABORATORE_CREAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Creazione collaboratore fallita"),
     COLLABORATORE_MODIFICA_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Modifica collaboratore fallita"),
     COLLABORATORE_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Eliminazione collaboratore fallita"),
-    COLLABORATORE_NON_DISPONIBILE_DA_CALENDARIO(HttpStatus.BAD_REQUEST, "Il collaboratore non lavora nella giornata o fascia oraria selezionata"
-    ),
+    COLLABORATORE_NON_DISPONIBILE_DA_CALENDARIO(HttpStatus.BAD_REQUEST, "Il collaboratore non lavora nella giornata o fascia oraria selezionata"),
     COLLABORATORE_ASSENTE(HttpStatus.BAD_REQUEST, "Collaboratore assente nella data e fascia oraria richiesta"),
-    COLLABORATORE_NON_ELIMINABILE(
-            HttpStatus.BAD_REQUEST,
-            "Collaboratore non eliminabile perché esistono prenotazioni, servizi, calendari o assenze associati"
-    ),
+    COLLABORATORE_NON_ELIMINABILE(HttpStatus.BAD_REQUEST, "Collaboratore non eliminabile perché esistono prenotazioni, servizi, calendari o assenze associati"),
+    SERVIZIO_A_POSTI_NON_CONFIGURATO(HttpStatus.BAD_REQUEST, "Servizio a posti non configurato correttamente"),
+    POSTI_SERVIZIO_ESAURITI(HttpStatus.BAD_REQUEST, "Posti esauriti per il servizio nella fascia oraria richiesta"),
+    COLLABORATORE_NON_PREVISTO_PER_SERVIZIO_A_POSTI(HttpStatus.BAD_REQUEST, "Collaboratore non previsto per un servizio a posti"),
+
     // =========================
     // COLLABORATORE SERVIZIO
     // =========================
@@ -82,9 +82,13 @@ public enum AppError {
     PRENOTAZIONE_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Eliminazione prenotazione fallita"),
     PRENOTAZIONE_NON_VALIDA(HttpStatus.BAD_REQUEST, "Prenotazione non valida"),
     PRENOTAZIONE_NON_ANNULLABILE(HttpStatus.BAD_REQUEST, "Prenotazione non annullabile perché risulta già annullata o completata"),
+    PRENOTAZIONE_NON_MODIFICABILE(HttpStatus.BAD_REQUEST, "Prenotazione non modificabile nello stato attuale"),
+
+
     // =========================
     // CALENDARIO
     // =========================
+
     CALENDARIO_NON_TROVATO(HttpStatus.NOT_FOUND, "Calendario non trovato"),
     CALENDARIO_GIA_PRESENTE(HttpStatus.BAD_REQUEST, "Esiste già una fascia calendario sovrapposta per questo collaboratore"),
     GIORNO_CALENDARIO_NON_VALIDO(HttpStatus.BAD_REQUEST, "Giorno calendario non valido"),
@@ -95,8 +99,8 @@ public enum AppError {
 
 
     // =====================
-// ASSENZA COLLABORATORE
-// =====================
+    // ASSENZA COLLABORATORE
+    // =====================
 
     ASSENZA_COLLABORATORE_NON_TROVATA(HttpStatus.NOT_FOUND, "Assenza collaboratore non trovata"),
     ASSENZA_COLLABORATORE_GIA_PRESENTE(HttpStatus.BAD_REQUEST, "Esiste già un'assenza sovrapposta per questo collaboratore"),

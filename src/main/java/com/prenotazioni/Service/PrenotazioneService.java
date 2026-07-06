@@ -17,5 +17,12 @@ public interface PrenotazioneService {
 
     EsitoResponse deletePrenotazione(Integer idPrenotazione);
 
-    PrenotazioneTo annullaPrenotazione(Integer idPrenotazione);
+    PrenotazioneTo utenteAnnullaPrenotazione(Integer idPrenotazione);
+
+    PrenotazioneTo strutturaAnnullaPrenotazione(Integer idPrenotazione);
+
+    List<PrenotazioneTo> getPrenotazioniDaRiprogrammare();
+
+    List<PrenotazioneTo> getPrenotazioniDaRiprogrammareByUtente(Integer idUtente);
+
 }

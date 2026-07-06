@@ -47,9 +47,23 @@ public class ServizioServiceImpl implements ServizioService {
         TipoGestioneServizio tipoGestioneServizio;
 
         try {
-            tipoGestioneServizio = TipoGestioneServizio.valueOf(servizioTo.getTipoGestioneServizio().toUpperCase());
+            tipoGestioneServizio = TipoGestioneServizio.valueOf(
+                    servizioTo.getTipoGestioneServizio().toUpperCase()
+            );
         } catch (Exception e) {
             throw new ServiceException(AppError.TIPO_GESTIONE_SERVIZIO_NON_VALIDO, e);
+        }
+
+        if (tipoGestioneServizio == TipoGestioneServizio.A_POSTI) {
+
+            if (servizioTo.getPostiMassimiServizio() == null
+                    || servizioTo.getPostiMassimiServizio() <= 0) {
+                throw new ServiceException(AppError.SERVIZIO_A_POSTI_NON_CONFIGURATO);
+            }
+        }
+
+        if (tipoGestioneServizio == TipoGestioneServizio.CON_COLLABORATORE) {
+            servizioTo.setPostiMassimiServizio(null);
         }
 
         if (servizioTo.getIdServizio() == null) {
@@ -60,11 +74,14 @@ public class ServizioServiceImpl implements ServizioService {
 
             try {
                 ServizioPo servizioPo = servizioMapper.toEntity(servizioTo);
+
                 servizioPo.setTipoGestioneServizio(tipoGestioneServizio);
+                servizioPo.setPostiMassimiServizio(servizioTo.getPostiMassimiServizio());
                 servizioPo.setAttivoServizio(true);
                 servizioPo.setDataCreazioneServizio(LocalDateTime.now());
 
                 servizioPo = servizioRepository.save(servizioPo);
+
                 return servizioMapper.toDto(servizioPo);
 
             } catch (Exception e) {
@@ -72,7 +89,9 @@ public class ServizioServiceImpl implements ServizioService {
             }
         }
 
-        ServizioPo servizioPo = servizioRepository.findById(servizioTo.getIdServizio()).orElse(null);
+        ServizioPo servizioPo = servizioRepository
+                .findById(servizioTo.getIdServizio())
+                .orElse(null);
 
         if (servizioPo == null) {
             throw new ServiceException(AppError.SERVIZIO_NON_TROVATO);
@@ -99,6 +118,7 @@ public class ServizioServiceImpl implements ServizioService {
             }
 
             servizioPo = servizioRepository.save(servizioPo);
+
             return servizioMapper.toDto(servizioPo);
 
         } catch (Exception e) {
