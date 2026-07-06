@@ -26,4 +26,5 @@ public interface CollaboratoreServizioRepository extends JpaRepository<Collabora
     boolean existsByCollaboratorePo_IdCollaboratore(Integer idCollaboratore);
 
     boolean existsByServizioPo_IdServizio(Integer idServizio);
+
 }

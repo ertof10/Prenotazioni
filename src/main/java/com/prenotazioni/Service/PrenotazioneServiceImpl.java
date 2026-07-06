@@ -31,13 +31,15 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
     private final CollaboratoreServizioRepository collaboratoreServizioRepository;
     private final PrenotazioneMapper prenotazioneMapper;
     private final CalendarioRepository calendarioRepository;
+    private final AssenzaCollaboratoreRepository assenzaCollaboratoreRepository;
     public PrenotazioneServiceImpl(PrenotazioneRepository prenotazioneRepository,
                                    UtenteRepository utenteRepository,
                                    ServizioRepository servizioRepository,
                                    CollaboratoreRepository collaboratoreRepository,
                                    CollaboratoreServizioRepository collaboratoreServizioRepository,
                                    PrenotazioneMapper prenotazioneMapper,
-                                   CalendarioRepository calendarioRepository) {
+                                   CalendarioRepository calendarioRepository,
+                                   AssenzaCollaboratoreRepository assenzaCollaboratoreRepository) {
 
         this.prenotazioneRepository = prenotazioneRepository;
         this.utenteRepository = utenteRepository;
@@ -46,12 +48,16 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
         this.collaboratoreServizioRepository = collaboratoreServizioRepository;
         this.prenotazioneMapper = prenotazioneMapper;
         this.calendarioRepository = calendarioRepository;
+        this.assenzaCollaboratoreRepository = assenzaCollaboratoreRepository;
     }
 
     @Override
     @Transactional
     public PrenotazioneTo saveOrUpdatePrenotazione(PrenotazioneTo prenotazioneTo) {
 
+        if (prenotazioneTo == null) {
+            throw new ServiceException(AppError.PRENOTAZIONE_NON_VALIDA);
+        }
         if (prenotazioneTo.getOraFinePrenotazione().isBefore(prenotazioneTo.getOraInizioPrenotazione())
                 || prenotazioneTo.getOraFinePrenotazione().equals(prenotazioneTo.getOraInizioPrenotazione())) {
             throw new ServiceException(AppError.ORARIO_PRENOTAZIONE_NON_VALIDO);
@@ -141,6 +147,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
                 throw new ServiceException(AppError.COLLABORATORE_NON_DISPONIBILE);
             }
 
+
         } else {
 
             List<CollaboratoreServizioPo> collaboratoriServizi =
@@ -155,6 +162,18 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
                 CollaboratorePo collaboratoreCandidatoPo = collaboratoreServizioPo.getCollaboratorePo();
 
                 if (!Boolean.TRUE.equals(collaboratoreCandidatoPo.getAttivoCollaboratore())) {
+                    continue;
+                }
+
+                boolean collaboratoreAssente =
+                        assenzaCollaboratoreRepository.existsAssenzaAttivaSuPrenotazione(
+                                collaboratoreCandidatoPo.getIdCollaboratore(),
+                                prenotazioneTo.getDataPrenotazione(),
+                                prenotazioneTo.getOraInizioPrenotazione(),
+                                prenotazioneTo.getOraFinePrenotazione()
+                        );
+
+                if (collaboratoreAssente) {
                     continue;
                 }
 
@@ -201,6 +220,18 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             }
         }
 
+        boolean collaboratoreAssente =
+                assenzaCollaboratoreRepository.existsAssenzaAttivaSuPrenotazione(
+                        collaboratorePo.getIdCollaboratore(),
+                        prenotazioneTo.getDataPrenotazione(),
+                        prenotazioneTo.getOraInizioPrenotazione(),
+                        prenotazioneTo.getOraFinePrenotazione()
+                );
+
+        if (collaboratoreAssente) {
+            throw new ServiceException(AppError.COLLABORATORE_ASSENTE);
+        }
+
         if (prenotazioneTo.getIdPrenotazione() == null) {
 
             try {
@@ -213,7 +244,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
                 prenotazionePo.setOraInizioPrenotazione(prenotazioneTo.getOraInizioPrenotazione());
                 prenotazionePo.setOraFinePrenotazione(prenotazioneTo.getOraFinePrenotazione());
                 prenotazionePo.setNotePrenotazione(prenotazioneTo.getNotePrenotazione());
-                prenotazionePo.setStatoPrenotazione(StatoPrenotazione.INSERITA);
+                prenotazionePo.setStatoPrenotazione(StatoPrenotazione.CONFERMATA);
                 prenotazionePo.setDataCreazionePrenotazione(LocalDateTime.now());
 
                 prenotazionePo = prenotazioneRepository.save(prenotazionePo);
@@ -243,7 +274,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             prenotazionePo.setOraInizioPrenotazione(prenotazioneTo.getOraInizioPrenotazione());
             prenotazionePo.setOraFinePrenotazione(prenotazioneTo.getOraFinePrenotazione());
             prenotazionePo.setNotePrenotazione(prenotazioneTo.getNotePrenotazione());
-            prenotazionePo.setStatoPrenotazione(StatoPrenotazione.MODIFICATA);
+            prenotazionePo.setStatoPrenotazione(StatoPrenotazione.CONFERMATA);
             prenotazionePo.setDataModificaPrenotazione(LocalDateTime.now());
 
             prenotazionePo = prenotazioneRepository.save(prenotazionePo);
@@ -306,6 +337,40 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             return new EsitoResponse("Prenotazione eliminata correttamente");
         } catch (Exception e) {
             throw new ServiceException(AppError.PRENOTAZIONE_ELIMINAZIONE_FALLITA, e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public PrenotazioneTo annullaPrenotazione(Integer idPrenotazione) {
+
+        if (idPrenotazione == null || idPrenotazione <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        PrenotazionePo prenotazionePo = prenotazioneRepository
+                .findById(idPrenotazione)
+                .orElse(null);
+
+        if (prenotazionePo == null) {
+            throw new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA);
+        }
+
+        if (prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.CONFERMATA
+                && prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.DA_RIPROGRAMMARE) {
+            throw new ServiceException(AppError.PRENOTAZIONE_NON_ANNULLABILE);
+        }
+
+        try {
+            prenotazionePo.setStatoPrenotazione(StatoPrenotazione.ANNULLATA_DA_UTENTE);
+            prenotazionePo.setDataModificaPrenotazione(LocalDateTime.now());
+
+            prenotazionePo = prenotazioneRepository.save(prenotazionePo);
+
+            return prenotazioneMapper.toDto(prenotazionePo);
+
+        } catch (Exception e) {
+            throw new ServiceException(AppError.PRENOTAZIONE_MODIFICA_FALLITA, e);
         }
     }
 }

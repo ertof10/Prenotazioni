@@ -16,4 +16,6 @@ public interface PrenotazioneService {
     List<PrenotazioneTo> getPrenotazioniByUtente(Integer idUtente);
 
     EsitoResponse deletePrenotazione(Integer idPrenotazione);
+
+    PrenotazioneTo annullaPrenotazione(Integer idPrenotazione);
 }

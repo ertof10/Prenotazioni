@@ -24,9 +24,15 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.saveOrUpdatePrenotazione(prenotazioneTo));
     }
 
+
     @PutMapping("/modifica")
     public ResponseEntity<PrenotazioneTo> modificaPrenotazione(@Valid @RequestBody PrenotazioneTo prenotazioneTo) {
         return ResponseEntity.ok(prenotazioneService.saveOrUpdatePrenotazione(prenotazioneTo));
+    }
+
+    @PutMapping("/annulla/{idPrenotazione}")
+    public ResponseEntity<PrenotazioneTo> annullaPrenotazione(@PathVariable Integer idPrenotazione) {
+        return ResponseEntity.ok(prenotazioneService.annullaPrenotazione(idPrenotazione));
     }
 
     @GetMapping("/cerca-per-id/{idPrenotazione}")

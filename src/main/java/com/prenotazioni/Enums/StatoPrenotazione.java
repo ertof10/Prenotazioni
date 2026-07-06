@@ -1,8 +1,9 @@
 package com.prenotazioni.Enums;
 
 public enum StatoPrenotazione {
-    INSERITA,
-    MODIFICATA,
-    CAMCELLATA,
+    CONFERMATA,
+    ANNULLATA_DA_UTENTE,
+    ANNULLATA_DA_STRUTTURA,
+    DA_RIPROGRAMMARE,
     COMPLETATA
 }

@@ -1,14 +1,11 @@
 package com.prenotazioni.Service;
 
-import com.prenotazioni.Dao.CalendarioRepository;
-import com.prenotazioni.Dao.CollaboratoreServizioRepository;
-import com.prenotazioni.Dao.PrenotazioneRepository;
+import com.prenotazioni.Dao.*;
 import com.prenotazioni.Dto.CollaboratoreTo;
 import com.prenotazioni.Error.AppError;
 import com.prenotazioni.Error.ServiceException;
 import com.prenotazioni.Mapper.CollaboratoreMapper;
 import com.prenotazioni.Po.CollaboratorePo;
-import com.prenotazioni.Dao.CollaboratoreRepository;
 import com.prenotazioni.Response.EsitoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +22,16 @@ public class CollaboratoreServiceImpl implements CollaboratoreService {
     private final PrenotazioneRepository prenotazioneRepository;
     private final CollaboratoreServizioRepository collaboratoreServizioRepository;
     private final CalendarioRepository calendarioRepository;
+    private final AssenzaCollaboratoreRepository assenzaCollaboratoreRepository;
 
     public CollaboratoreServiceImpl(CollaboratoreRepository collaboratoreRepository,
-                                    CollaboratoreMapper collaboratoreMapper , PrenotazioneRepository prenotazioneRepository ,CollaboratoreServizioRepository collaboratoreServizioRepository, CalendarioRepository calendarioRepository) {
+                                    CollaboratoreMapper collaboratoreMapper , PrenotazioneRepository prenotazioneRepository ,CollaboratoreServizioRepository collaboratoreServizioRepository, CalendarioRepository calendarioRepository, AssenzaCollaboratoreRepository assenzaCollaboratoreRepository) {
         this.collaboratoreRepository = collaboratoreRepository;
         this.collaboratoreMapper = collaboratoreMapper;
         this.prenotazioneRepository = prenotazioneRepository;
         this.collaboratoreServizioRepository = collaboratoreServizioRepository;
         this.calendarioRepository = calendarioRepository;
+        this.assenzaCollaboratoreRepository = assenzaCollaboratoreRepository;
     }
 
     @Override
@@ -151,7 +150,8 @@ public class CollaboratoreServiceImpl implements CollaboratoreService {
 
         if (prenotazioneRepository.existsByCollaboratorePo_IdCollaboratore(idCollaboratore)
                 || collaboratoreServizioRepository.existsByCollaboratorePo_IdCollaboratore(idCollaboratore)
-                || calendarioRepository.existsByCollaboratorePo_IdCollaboratore(idCollaboratore)) {
+                || calendarioRepository.existsByCollaboratorePo_IdCollaboratore(idCollaboratore)
+                || assenzaCollaboratoreRepository.existsByCollaboratorePo_IdCollaboratore(idCollaboratore)) {
             throw new ServiceException(AppError.COLLABORATORE_NON_ELIMINABILE);
         }
 
