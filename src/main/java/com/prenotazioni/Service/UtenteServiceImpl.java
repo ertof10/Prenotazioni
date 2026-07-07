@@ -3,6 +3,7 @@ package com.prenotazioni.Service;
 
 
 import com.prenotazioni.Dao.PrenotazioneRepository;
+import com.prenotazioni.Dao.PreventivoRepository;
 import com.prenotazioni.Dao.UtenteRepository;
 import com.prenotazioni.Dto.UtenteTo;
 import com.prenotazioni.Enums.AppRole;
@@ -23,11 +24,12 @@ public class UtenteServiceImpl implements UtenteService {
     private final UtenteRepository utenteRepository;
     private final UtenteMapper utenteMapper;
     private final PrenotazioneRepository prenotazioneRepository;
-
-    public UtenteServiceImpl(UtenteRepository utenteRepository, UtenteMapper utenteMapper, PrenotazioneRepository prenotazioneRepository) {
+    private final PreventivoRepository preventivoRepository;
+    public UtenteServiceImpl(UtenteRepository utenteRepository, UtenteMapper utenteMapper, PrenotazioneRepository prenotazioneRepository,PreventivoRepository preventivoRepository) {
         this.utenteRepository = utenteRepository;
         this.utenteMapper = utenteMapper;
         this.prenotazioneRepository = prenotazioneRepository;
+        this.preventivoRepository = preventivoRepository;
     }
 
     @Override
@@ -43,7 +45,8 @@ public class UtenteServiceImpl implements UtenteService {
             }
 
             UtentePo utentePo = utenteMapper.toEntity(utenteTo);
-            utentePo.setRuoloUtente(AppRole.UTENTE); // IMPOSTA IL RUOLO DI DEFAULT A "UTENTE"
+            utentePo.setRuoloUtente(AppRole.UTENTE);
+            utentePo.setAttivoUtente(true);
             utentePo = utenteRepository.save(utentePo);
             return utenteMapper.toDto(utentePo);
         }
@@ -62,6 +65,7 @@ public class UtenteServiceImpl implements UtenteService {
         esistente.setCognomeUtente(utenteTo.getCognomeUtente());
         esistente.setEmailUtente(utenteTo.getEmailUtente());
         esistente.setTelefonoUtente(utenteTo.getTelefonoUtente());
+        esistente.setAttivoUtente(utenteTo.getAttivoUtente());
 
         esistente = utenteRepository.save(esistente);
         return utenteMapper.toDto(esistente);
@@ -101,6 +105,9 @@ public class UtenteServiceImpl implements UtenteService {
         if (prenotazioneRepository.existsByUtentePo_IdUtente(idUtente)) {
             throw new ServiceException(AppError.UTENTE_NON_ELIMINABILE);
         }
+        if (preventivoRepository.existsByUtentePo_IdUtente(idUtente)) {
+            throw new ServiceException(AppError.UTENTE_CON_PREVENTIVI_ASSOCIATI);
+        }
 
         try {
             utenteRepository.deleteById(idUtente);
@@ -108,5 +115,47 @@ public class UtenteServiceImpl implements UtenteService {
         } catch (Exception e) {
             throw new ServiceException(AppError.UTENTE_ELIMINAZIONE_FALLITA, e);
         }
+    }
+
+    @Override
+    @Transactional
+    public UtenteTo disattivaUtente(Integer idUtente) {
+
+        if (idUtente == null || idUtente <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        UtentePo utentePo = utenteRepository.findById(idUtente).orElse(null);
+
+        if (utentePo == null) {
+            throw new ServiceException(AppError.UTENTE_NON_TROVATO);
+        }
+
+        utentePo.setAttivoUtente(false);
+
+        utentePo = utenteRepository.save(utentePo);
+
+        return utenteMapper.toDto(utentePo);
+    }
+
+    @Override
+    @Transactional
+    public UtenteTo riattivaUtente(Integer idUtente) {
+
+        if (idUtente == null || idUtente <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        UtentePo utentePo = utenteRepository.findById(idUtente).orElse(null);
+
+        if (utentePo == null) {
+            throw new ServiceException(AppError.UTENTE_NON_TROVATO);
+        }
+
+        utentePo.setAttivoUtente(true);
+
+        utentePo = utenteRepository.save(utentePo);
+
+        return utenteMapper.toDto(utentePo);
     }
 }

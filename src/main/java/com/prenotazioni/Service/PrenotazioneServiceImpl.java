@@ -75,6 +75,9 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
         if (utentePo == null) {
             throw new ServiceException(AppError.UTENTE_NON_TROVATO);
         }
+        if (!Boolean.TRUE.equals(utentePo.getAttivoUtente())) {
+            throw new ServiceException(AppError.UTENTE_NON_ATTIVO);
+        }
 
         ServizioPo servizioPo = servizioRepository.findById(prenotazioneTo.getIdServizio()).orElse(null);
 
@@ -85,6 +88,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
         if (!Boolean.TRUE.equals(servizioPo.getAttivoServizio())) {
             throw new ServiceException(AppError.SERVIZIO_NON_ATTIVO);
         }
+
 
         if (servizioPo.getTipoGestioneServizio() == null) {
             throw new ServiceException(AppError.TIPO_GESTIONE_SERVIZIO_NON_VALIDO);
@@ -204,6 +208,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             if (collaboratorePo == null) {
                 throw new ServiceException(AppError.COLLABORATORE_NON_TROVATO);
             }
+
 
             if (!Boolean.TRUE.equals(collaboratorePo.getAttivoCollaboratore())) {
                 throw new ServiceException(AppError.COLLABORATORE_NON_ATTIVO);

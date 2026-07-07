@@ -16,4 +16,8 @@ public interface ServizioService {
     List<ServizioTo> getServiziAttivi();
 
     EsitoResponse deleteServizio(Integer idServizio);
+
+    ServizioTo disattivaServizio(Integer idServizio);
+
+    ServizioTo riattivaServizio(Integer idServizio);
 }

@@ -15,4 +15,8 @@ public interface UtenteService {
     List<UtenteTo> getAllUtenti();
 
     EsitoResponse deleteUtente(Integer idUtente);
+
+    UtenteTo disattivaUtente(Integer idUtente);
+
+    UtenteTo riattivaUtente(Integer idUtente);
 }

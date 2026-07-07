@@ -29,6 +29,16 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.saveOrUpdateCollaboratore(collaboratoreTo));
     }
 
+    @PutMapping("/disattiva/{idCollaboratore}")
+    public ResponseEntity<CollaboratoreTo> disattivaCollaboratore(@PathVariable Integer idCollaboratore) {
+        return ResponseEntity.ok(collaboratoreService.disattivaCollaboratore(idCollaboratore));
+    }
+
+    @PutMapping("/riattiva/{idCollaboratore}")
+    public ResponseEntity<CollaboratoreTo> riattivaCollaboratore(@PathVariable Integer idCollaboratore) {
+        return ResponseEntity.ok(collaboratoreService.riattivaCollaboratore(idCollaboratore));
+    }
+
     @GetMapping("/cerca-per-id/{idCollaboratore}")
     public ResponseEntity<CollaboratoreTo> cercaCollaboratorePerId(@PathVariable Integer idCollaboratore) {
         return ResponseEntity.ok(collaboratoreService.getCollaboratoreById(idCollaboratore));

@@ -19,6 +19,7 @@ public class UtenteController {
     private final UtenteService service;
 
     public UtenteController(UtenteService service) {
+
         this.service = service;
     }
 
@@ -31,6 +32,15 @@ public class UtenteController {
     @PutMapping("/modifica")
     public ResponseEntity<UtenteTo> modificaUtente(@Valid @RequestBody UtenteTo utenteTo) {
         return ResponseEntity.ok(service.saveOrUpdateUtente(utenteTo));
+    }
+    @PutMapping("/disattiva/{idUtente}")
+    public ResponseEntity<UtenteTo> disattivaUtente(@PathVariable Integer idUtente){
+        return ResponseEntity.ok(service.disattivaUtente(idUtente));
+    }
+
+    @PutMapping("/riattiva/{idUtente}")
+    public ResponseEntity<UtenteTo> riattivaUtente(@PathVariable Integer idUtente){
+        return ResponseEntity.ok(service.riattivaUtente(idUtente));
     }
 
     @GetMapping("/cerca-per-id/{idUtente}")
@@ -47,4 +57,5 @@ public class UtenteController {
     public ResponseEntity<EsitoResponse> eliminaUtente(@PathVariable("idUtente") Integer idUtente) {
         return ResponseEntity.ok(service.deleteUtente(idUtente));
     }
+
 }

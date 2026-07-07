@@ -28,6 +28,8 @@ public class UtenteTo {
     @Size(max = 20, message = "Telefono troppo lungo")
     private String telefonoUtente;
 
+    private Boolean attivoUtente ;
+
 
 
     public UtenteTo() {

@@ -93,6 +93,16 @@ public interface PrenotazioneRepository extends JpaRepository<PrenotazionePo, In
             @Param("oraFinePrenotazione") LocalTime oraFinePrenotazione
     );
 
+    @Query("SELECT prenotazionePo " +
+            "FROM PrenotazionePo prenotazionePo " +
+            "WHERE prenotazionePo.collaboratorePo.idCollaboratore = :idCollaboratore " +
+            "AND prenotazionePo.statoPrenotazione = com.prenotazioni.Enums.StatoPrenotazione.CONFERMATA " +
+            "AND prenotazionePo.dataPrenotazione >= :dataDa")
+    List<PrenotazionePo> findPrenotazioniFutureConfermateByCollaboratore(
+            @Param("idCollaboratore") Integer idCollaboratore,
+            @Param("dataDa") LocalDate dataDa
+    );
+
     boolean existsByUtentePo_IdUtente(Integer idUtente);
 
     boolean existsByCollaboratorePo_IdCollaboratore(Integer idCollaboratore);

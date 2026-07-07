@@ -3,6 +3,7 @@ package com.prenotazioni.Service;
 
 import com.prenotazioni.Dao.CollaboratoreServizioRepository;
 import com.prenotazioni.Dao.PrenotazioneRepository;
+import com.prenotazioni.Dao.PreventivoRepository;
 import com.prenotazioni.Dao.ServizioRepository;
 import com.prenotazioni.Dto.ServizioTo;
 import com.prenotazioni.Enums.TipoGestioneServizio;
@@ -26,12 +27,14 @@ public class ServizioServiceImpl implements ServizioService {
     private final ServizioMapper servizioMapper;
     private final PrenotazioneRepository prenotazioneRepository;
     private final CollaboratoreServizioRepository collaboratoreServizioRepository;
+    private final PreventivoRepository preventivoRepository;
 
-    public ServizioServiceImpl(ServizioRepository servizioRepository, ServizioMapper servizioMapper, PrenotazioneRepository prenotazioneRepository, CollaboratoreServizioRepository collaboratoreServizioRepository) {
+    public ServizioServiceImpl(ServizioRepository servizioRepository, ServizioMapper servizioMapper, PrenotazioneRepository prenotazioneRepository, CollaboratoreServizioRepository collaboratoreServizioRepository, PreventivoRepository preventivoRepository) {
         this.servizioRepository = servizioRepository;
         this.servizioMapper = servizioMapper;
         this.prenotazioneRepository = prenotazioneRepository;
         this.collaboratoreServizioRepository = collaboratoreServizioRepository;
+        this.preventivoRepository = preventivoRepository;
     }
 
     @Override
@@ -175,6 +178,10 @@ public class ServizioServiceImpl implements ServizioService {
                 || collaboratoreServizioRepository.existsByServizioPo_IdServizio(idServizio)) {
             throw new ServiceException(AppError.SERVIZIO_NON_ELIMINABILE);
         }
+        if (preventivoRepository.existsByServizioPo_IdServizio((idServizio))) {
+            throw new ServiceException(AppError.SERVIZIO_CON_PREVENTIVI_ASSOCIATI);
+        }
+
 
         try {
             servizioRepository.deleteById(idServizio);
@@ -183,4 +190,51 @@ public class ServizioServiceImpl implements ServizioService {
             throw new ServiceException(AppError.SERVIZIO_ELIMINAZIONE_FALLITA, e);
         }
     }
+
+    @Override
+    @Transactional
+    public ServizioTo disattivaServizio(Integer idServizio) {
+
+        if (idServizio == null || idServizio <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        ServizioPo servizioPo = servizioRepository
+                .findById(idServizio)
+                .orElse(null);
+
+        if (servizioPo == null) {
+            throw new ServiceException(AppError.SERVIZIO_NON_TROVATO);
+        }
+
+        servizioPo.setAttivoServizio(false);
+
+        servizioPo = servizioRepository.save(servizioPo);
+
+        return servizioMapper.toDto(servizioPo);
+    }
+
+    @Override
+    @Transactional
+    public ServizioTo riattivaServizio(Integer idServizio) {
+
+        if (idServizio == null || idServizio <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        ServizioPo servizioPo = servizioRepository
+                .findById(idServizio)
+                .orElse(null);
+
+        if (servizioPo == null) {
+            throw new ServiceException(AppError.SERVIZIO_NON_TROVATO);
+        }
+
+        servizioPo.setAttivoServizio(true);
+
+        servizioPo = servizioRepository.save(servizioPo);
+
+        return servizioMapper.toDto(servizioPo);
+    }
 }
+

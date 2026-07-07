@@ -2,14 +2,17 @@ package com.prenotazioni.Service;
 
 import com.prenotazioni.Dao.*;
 import com.prenotazioni.Dto.CollaboratoreTo;
+import com.prenotazioni.Enums.StatoPrenotazione;
 import com.prenotazioni.Error.AppError;
 import com.prenotazioni.Error.ServiceException;
 import com.prenotazioni.Mapper.CollaboratoreMapper;
 import com.prenotazioni.Po.CollaboratorePo;
+import com.prenotazioni.Po.PrenotazionePo;
 import com.prenotazioni.Response.EsitoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -161,5 +164,64 @@ public class CollaboratoreServiceImpl implements CollaboratoreService {
         } catch (Exception e) {
             throw new ServiceException(AppError.COLLABORATORE_ELIMINAZIONE_FALLITA, e);
         }
+    }
+
+    @Override
+    @Transactional
+    public CollaboratoreTo disattivaCollaboratore(Integer idCollaboratore) {
+
+        if (idCollaboratore == null || idCollaboratore <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        CollaboratorePo collaboratorePo = collaboratoreRepository
+                .findById(idCollaboratore)
+                .orElse(null);
+
+        if (collaboratorePo == null) {
+            throw new ServiceException(AppError.COLLABORATORE_NON_TROVATO);
+        }
+
+        collaboratorePo.setAttivoCollaboratore(false);
+
+        List<PrenotazionePo> prenotazioniFuture =
+                prenotazioneRepository.findPrenotazioniFutureConfermateByCollaboratore(
+                        idCollaboratore,
+                        LocalDate.now()
+                );
+
+        for (PrenotazionePo prenotazionePo : prenotazioniFuture) {
+            prenotazionePo.setStatoPrenotazione(StatoPrenotazione.DA_RIPROGRAMMARE);
+            prenotazionePo.setDataModificaPrenotazione(LocalDateTime.now());
+        }
+
+        prenotazioneRepository.saveAll(prenotazioniFuture);
+
+        collaboratorePo = collaboratoreRepository.save(collaboratorePo);
+
+        return collaboratoreMapper.toDto(collaboratorePo);
+    }
+
+    @Override
+    @Transactional
+    public CollaboratoreTo riattivaCollaboratore(Integer idCollaboratore) {
+
+        if (idCollaboratore == null || idCollaboratore <= 0) {
+            throw new ServiceException(AppError.ID_NON_VALIDO);
+        }
+
+        CollaboratorePo collaboratorePo = collaboratoreRepository
+                .findById(idCollaboratore)
+                .orElse(null);
+
+        if (collaboratorePo == null) {
+            throw new ServiceException(AppError.COLLABORATORE_NON_TROVATO);
+        }
+
+        collaboratorePo.setAttivoCollaboratore(true);
+
+        collaboratorePo = collaboratoreRepository.save(collaboratorePo);
+
+        return collaboratoreMapper.toDto(collaboratorePo);
     }
 }

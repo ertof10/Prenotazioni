@@ -16,4 +16,8 @@ public interface CollaboratoreService {
     List<CollaboratoreTo> getCollaboratoriAttivi();
 
     EsitoResponse deleteCollaboratore(Integer idCollaboratore);
+
+    CollaboratoreTo disattivaCollaboratore(Integer idCollaboratore);
+
+    CollaboratoreTo riattivaCollaboratore(Integer idCollaboratore);
 }

@@ -32,12 +32,12 @@ public class CollaboratorePo {
     private String descrizioneCollaboratore;
 
     @Column(nullable = false)
-    private Boolean attivoCollaboratore;
-
-    @Column(nullable = false)
     private LocalDateTime dataCreazioneCollaboratore;
 
     private LocalDateTime dataModificaCollaboratore;
+
+    @Column(nullable = false)
+    private Boolean attivoCollaboratore = true;
 
     public CollaboratorePo() {
     }

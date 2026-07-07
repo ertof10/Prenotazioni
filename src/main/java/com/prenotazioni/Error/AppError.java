@@ -23,6 +23,8 @@ public enum AppError {
     UTENTE_MODIFICA_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Modifica utente fallita"),
     UTENTE_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Eliminazione utente fallita"),
     UTENTE_NON_ELIMINABILE(HttpStatus.BAD_REQUEST, "Utente non eliminabile perché esistono prenotazioni associate"),
+    UTENTE_CON_PREVENTIVI_ASSOCIATI(HttpStatus.BAD_REQUEST, "Impossibile eliminare utente con preventivi associati"),
+    UTENTE_NON_ATTIVO(HttpStatus.BAD_REQUEST, "Utente non attivo"),
 
 
     // =========================
@@ -37,6 +39,8 @@ public enum AppError {
     SERVIZIO_MODIFICA_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Modifica servizio fallita"),
     SERVIZIO_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Eliminazione servizio fallita"),
     SERVIZIO_NON_ELIMINABILE(HttpStatus.BAD_REQUEST, "Servizio non eliminabile perché esistono prenotazioni o associazioni collaboratore-servizio collegate"),
+    SERVIZIO_CON_PREVENTIVI_ASSOCIATI(HttpStatus.BAD_REQUEST, "Impossibile eliminare servizio con preventivi associati"),
+
 
     // =========================
     // COLLABORATORE
@@ -55,6 +59,9 @@ public enum AppError {
     SERVIZIO_A_POSTI_NON_CONFIGURATO(HttpStatus.BAD_REQUEST, "Servizio a posti non configurato correttamente"),
     POSTI_SERVIZIO_ESAURITI(HttpStatus.BAD_REQUEST, "Posti esauriti per il servizio nella fascia oraria richiesta"),
     COLLABORATORE_NON_PREVISTO_PER_SERVIZIO_A_POSTI(HttpStatus.BAD_REQUEST, "Collaboratore non previsto per un servizio a posti"),
+
+
+
 
     // =========================
     // COLLABORATORE SERVIZIO
@@ -108,6 +115,25 @@ public enum AppError {
     ASSENZA_COLLABORATORE_CREAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Errore durante creazione assenza collaboratore"),
     ASSENZA_COLLABORATORE_MODIFICA_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Errore durante modifica assenza collaboratore"),
     ASSENZA_COLLABORATORE_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Errore durante eliminazione assenza collaboratore"),
+
+
+    // =========================
+    // PREVENTIVO
+    // =========================
+
+    PREVENTIVO_NON_TROVATO(HttpStatus.NOT_FOUND, "Preventivo non trovato"),
+    PREVENTIVO_NON_VALIDO(HttpStatus.BAD_REQUEST, "Preventivo non valido"),
+    STATO_PREVENTIVO_NON_VALIDO(HttpStatus.BAD_REQUEST, "Stato preventivo non valido"),
+    IMPORTO_PREVENTIVO_NON_VALIDO(HttpStatus.BAD_REQUEST, "Importo preventivo non valido"),
+    PREVENTIVO_NON_MODIFICABILE(HttpStatus.BAD_REQUEST, "Preventivo non modificabile nello stato attuale"),
+    PREVENTIVO_NON_INVIABILE(HttpStatus.BAD_REQUEST, "Preventivo non inviabile nello stato attuale o senza importo valido"),
+    PREVENTIVO_NON_ACCETTABILE(HttpStatus.BAD_REQUEST, "Preventivo accettabile solo se inviato"),
+    PREVENTIVO_NON_RIFIUTABILE(HttpStatus.BAD_REQUEST, "Preventivo rifiutabile solo se inviato"),
+    PREVENTIVO_CREAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Creazione preventivo fallita"),
+    PREVENTIVO_MODIFICA_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Modifica preventivo fallita"),
+    PREVENTIVO_ELIMINAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Eliminazione preventivo fallita"),
+
+
 
     // =========================
     // ERRORI TECNICI / VALIDAZIONE

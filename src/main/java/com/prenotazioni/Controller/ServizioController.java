@@ -28,6 +28,14 @@ public class ServizioController {
     public ResponseEntity<ServizioTo> modificaServizio(@Valid @RequestBody ServizioTo servizioTo) {
         return ResponseEntity.ok(servizioService.saveOrUpdateServizio(servizioTo));
     }
+    @PutMapping("/disattiva/{idServizio}")
+    public ResponseEntity<ServizioTo> disattivaServizio(@PathVariable Integer idServizio) {
+        return ResponseEntity.ok(servizioService.disattivaServizio(idServizio));
+    }
+    @PutMapping("/riattiva/{idServizio}")
+    public ResponseEntity<ServizioTo> riattivaServizio(@PathVariable Integer idServizio) {
+        return ResponseEntity.ok(servizioService.riattivaServizio(idServizio));
+    }
 
     @GetMapping("/cerca-per-id/{idServizio}")
     public ResponseEntity<ServizioTo> cercaServizioPerId(@PathVariable Integer idServizio) {

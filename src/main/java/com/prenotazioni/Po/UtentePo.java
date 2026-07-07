@@ -31,6 +31,9 @@ public class UtentePo {
     @Column(nullable = false, length = 20)
     private AppRole ruoloUtente;
 
+    @Column(nullable = false)
+    private Boolean attivoUtente = true;
+
     public UtentePo() {
     }
 }
