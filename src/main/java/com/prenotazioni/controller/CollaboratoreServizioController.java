@@ -3,12 +3,15 @@ package com.prenotazioni.controller;
 import com.prenotazioni.dto.CollaboratoreServizioTo;
 import com.prenotazioni.response.EsitoResponse;
 import com.prenotazioni.service.CollaboratoreServizioService;
+import com.prenotazioni.validation.ValidationGroups;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/collaboratore-servizio")
 public class CollaboratoreServizioController {
@@ -21,20 +24,29 @@ public class CollaboratoreServizioController {
 
     @PostMapping("/inserimento")
     public ResponseEntity<CollaboratoreServizioTo> inserimentoCollaboratoreServizio(
-            @Valid @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
-        return ResponseEntity.ok(collaboratoreServizioService.saveOrUpdateCollaboratoreServizio(collaboratoreServizioTo));
+            @Validated(ValidationGroups.Create.class) @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.saveOrUpdateCollaboratoreServizio(collaboratoreServizioTo)
+        );
     }
 
     @PutMapping("/modifica")
     public ResponseEntity<CollaboratoreServizioTo> modificaCollaboratoreServizio(
-            @Valid @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
-        return ResponseEntity.ok(collaboratoreServizioService.saveOrUpdateCollaboratoreServizio(collaboratoreServizioTo));
+            @Validated(ValidationGroups.Update.class) @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.saveOrUpdateCollaboratoreServizio(collaboratoreServizioTo)
+        );
     }
 
     @GetMapping("/cerca-per-id/{idCollaboratoreServizio}")
     public ResponseEntity<CollaboratoreServizioTo> cercaCollaboratoreServizioPerId(
-            @PathVariable Integer idCollaboratoreServizio) {
-        return ResponseEntity.ok(collaboratoreServizioService.getCollaboratoreServizioById(idCollaboratoreServizio));
+            @PathVariable @Min(1) Integer idCollaboratoreServizio) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.getCollaboratoreServizioById(idCollaboratoreServizio)
+        );
     }
 
     @GetMapping("/stampa-tutti")
@@ -44,18 +56,28 @@ public class CollaboratoreServizioController {
 
     @GetMapping("/stampa-servizi-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<CollaboratoreServizioTo>> stampaServiziPerCollaboratore(
-            @PathVariable Integer idCollaboratore) {
-        return ResponseEntity.ok(collaboratoreServizioService.getServiziByCollaboratore(idCollaboratore));
+            @PathVariable @Min(1) Integer idCollaboratore) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.getServiziByCollaboratore(idCollaboratore)
+        );
     }
 
     @GetMapping("/stampa-collaboratori-per-servizio/{idServizio}")
     public ResponseEntity<List<CollaboratoreServizioTo>> stampaCollaboratoriPerServizio(
-            @PathVariable Integer idServizio) {
-        return ResponseEntity.ok(collaboratoreServizioService.getCollaboratoriByServizio(idServizio));
+            @PathVariable @Min(1) Integer idServizio) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.getCollaboratoriByServizio(idServizio)
+        );
     }
 
     @DeleteMapping("/elimina-per-id/{idCollaboratoreServizio}")
-    public ResponseEntity<EsitoResponse> eliminaCollaboratoreServizio(@PathVariable Integer idCollaboratoreServizio) {
-        return ResponseEntity.ok(collaboratoreServizioService.deleteCollaboratoreServizio(idCollaboratoreServizio));
+    public ResponseEntity<EsitoResponse> eliminaCollaboratoreServizio(
+            @PathVariable @Min(1) Integer idCollaboratoreServizio) {
+
+        return ResponseEntity.ok(
+                collaboratoreServizioService.deleteCollaboratoreServizio(idCollaboratoreServizio)
+        );
     }
 }

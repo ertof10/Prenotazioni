@@ -7,11 +7,7 @@ import com.prenotazioni.enums.TipoGestioneServizio;
 import com.prenotazioni.error.AppError;
 import com.prenotazioni.error.ServiceException;
 import com.prenotazioni.mapper.PrenotazioneMapper;
-import com.prenotazioni.po.CollaboratorePo;
-import com.prenotazioni.po.CollaboratoreServizioPo;
-import com.prenotazioni.po.PrenotazionePo;
-import com.prenotazioni.po.ServizioPo;
-import com.prenotazioni.po.UtentePo;
+import com.prenotazioni.po.*;
 import com.prenotazioni.response.EsitoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,44 +86,75 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
     }
 
     private UtentePo recuperaUtenteAttivo(Integer idUtente) {
-        UtentePo utentePo = utenteRepository.findById(idUtente).orElse(null);
-        if (utentePo == null) {
-            throw new ServiceException(AppError.UTENTE_NON_TROVATO);
-        }
+
+        UtentePo utentePo = recuperaUtenteConLock(idUtente);
+
         if (!Boolean.TRUE.equals(utentePo.getAttivoUtente())) {
             throw new ServiceException(AppError.UTENTE_NON_ATTIVO);
         }
+
         return utentePo;
     }
 
+    private UtentePo recuperaUtenteConLock(Integer idUtente) {
+
+        return utenteRepository.findByIdForUpdate(idUtente)
+                .orElseThrow(() -> new ServiceException(AppError.UTENTE_NON_TROVATO));
+    }
+
     private ServizioPo recuperaServizioAttivo(Integer idServizio) {
-        ServizioPo servizioPo = servizioRepository.findById(idServizio).orElse(null);
-        if (servizioPo == null) {
-            throw new ServiceException(AppError.SERVIZIO_NON_TROVATO);
-        }
+
+        ServizioPo servizioPo = recuperaServizioConLock(idServizio);
+
         if (!Boolean.TRUE.equals(servizioPo.getAttivoServizio())) {
             throw new ServiceException(AppError.SERVIZIO_NON_ATTIVO);
         }
+
         if (servizioPo.getTipoGestioneServizio() == null) {
             throw new ServiceException(AppError.TIPO_GESTIONE_SERVIZIO_NON_VALIDO);
         }
+
         return servizioPo;
     }
 
+    private ServizioPo recuperaServizioConLock(Integer idServizio) {
+
+        return servizioRepository.findByIdForUpdate(idServizio)
+                .orElseThrow(() -> new ServiceException(AppError.SERVIZIO_NON_TROVATO));
+    }
+
+    private PrenotazionePo recuperaPrenotazioneConLock(Integer idPrenotazione) {
+
+        return prenotazioneRepository.findByIdForUpdate(idPrenotazione)
+                .orElseThrow(() -> new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA));
+    }
+
+
+    private CollaboratorePo recuperaCollaboratoreConLock(Integer idCollaboratore) {
+
+        return collaboratoreRepository.findByIdForUpdate(idCollaboratore)
+                .orElseThrow(() -> new ServiceException(AppError.COLLABORATORE_NON_TROVATO));
+    }
+
+
     private PrenotazionePo recuperaPrenotazioneEsistenteSeModifica(Integer idPrenotazione) {
+
         if (idPrenotazione == null) {
             return null;
         }
+
         if (idPrenotazione <= 0) {
             throw new ServiceException(AppError.ID_NON_VALIDO);
         }
-        PrenotazionePo prenotazioneEsistentePo = prenotazioneRepository.findById(idPrenotazione).orElse(null);
-        if (prenotazioneEsistentePo == null) {
-            throw new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA);
-        }
-        if (prenotazioneEsistentePo.getStatoPrenotazione() != StatoPrenotazione.CONFERMATA && prenotazioneEsistentePo.getStatoPrenotazione() != StatoPrenotazione.DA_RIPROGRAMMARE) {
+
+        PrenotazionePo prenotazioneEsistentePo = recuperaPrenotazioneConLock(idPrenotazione);
+
+        if (prenotazioneEsistentePo.getStatoPrenotazione() != StatoPrenotazione.CONFERMATA
+                && prenotazioneEsistentePo.getStatoPrenotazione() != StatoPrenotazione.DA_RIPROGRAMMARE) {
+
             throw new ServiceException(AppError.PRENOTAZIONE_NON_MODIFICABILE);
         }
+
         return prenotazioneEsistentePo;
     }
 
@@ -176,17 +203,28 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
         return selezionaCollaboratoreAutomatico(prenotazioneTo, servizioPo, giornoSettimanaPrenotazione);
     }
 
-    private CollaboratorePo recuperaEValidaCollaboratoreManuale(PrenotazioneTo prenotazioneTo, ServizioPo servizioPo, DayOfWeek giornoSettimanaPrenotazione) {
-        CollaboratorePo collaboratorePo = collaboratoreRepository.findById(prenotazioneTo.getIdCollaboratore()).orElse(null);
-        if (collaboratorePo == null) {
-            throw new ServiceException(AppError.COLLABORATORE_NON_TROVATO);
-        }
+    private CollaboratorePo recuperaEValidaCollaboratoreManuale(
+            PrenotazioneTo prenotazioneTo,
+            ServizioPo servizioPo,
+            DayOfWeek giornoSettimanaPrenotazione) {
+
+        CollaboratorePo collaboratorePo =
+                recuperaCollaboratoreConLock(prenotazioneTo.getIdCollaboratore());
+
         if (!Boolean.TRUE.equals(collaboratorePo.getAttivoCollaboratore())) {
             throw new ServiceException(AppError.COLLABORATORE_NON_ATTIVO);
         }
+
         verificaCollaboratoreAbilitatoAlServizio(collaboratorePo, servizioPo);
-        verificaCollaboratoreDisponibileDaCalendario(collaboratorePo, giornoSettimanaPrenotazione, prenotazioneTo);
+
+        verificaCollaboratoreDisponibileDaCalendario(
+                collaboratorePo,
+                giornoSettimanaPrenotazione,
+                prenotazioneTo
+        );
+
         verificaSovrapposizioneCollaboratore(collaboratorePo, prenotazioneTo);
+
         return collaboratorePo;
     }
 
@@ -213,22 +251,42 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
 
     private CollaboratorePo selezionaCollaboratoreAutomatico(PrenotazioneTo prenotazioneTo, ServizioPo servizioPo, DayOfWeek giornoSettimanaPrenotazione) {
         List<CollaboratoreServizioPo> collaboratoriServizi = collaboratoreServizioRepository.findByServizioPo_IdServizioAndAttivoCollaboratoreServizioTrue(servizioPo.getIdServizio());
+
+        List<CollaboratoreServizioPo> collaboratoriServiziOrdinati = collaboratoriServizi.stream()
+                .sorted((primoCollaboratoreServizio, secondoCollaboratoreServizio) ->
+                        primoCollaboratoreServizio.getCollaboratorePo().getIdCollaboratore()
+                                .compareTo(secondoCollaboratoreServizio.getCollaboratorePo().getIdCollaboratore()))
+                .collect(Collectors.toList());
+
         CollaboratorePo collaboratoreSelezionatoPo = null;
         Long caricoMinore = null;
-        for (CollaboratoreServizioPo collaboratoreServizioPo : collaboratoriServizi) {
-            CollaboratorePo collaboratoreCandidatoPo = collaboratoreServizioPo.getCollaboratorePo();
+
+        for (CollaboratoreServizioPo collaboratoreServizioPo : collaboratoriServiziOrdinati) {
+            CollaboratorePo collaboratoreCandidatoPo =
+                    recuperaCollaboratoreConLock(
+                            collaboratoreServizioPo.getCollaboratorePo().getIdCollaboratore()
+                    );
+
             if (!collaboratoreCandidatoValido(collaboratoreCandidatoPo, giornoSettimanaPrenotazione, prenotazioneTo)) {
                 continue;
             }
-            Long caricoCollaboratore = prenotazioneRepository.countPrenotazioniCollaboratorePerData(prenotazioneTo.getIdPrenotazione(), collaboratoreCandidatoPo.getIdCollaboratore(), prenotazioneTo.getDataPrenotazione());
+
+            Long caricoCollaboratore = prenotazioneRepository.countPrenotazioniCollaboratorePerData(
+                    prenotazioneTo.getIdPrenotazione(),
+                    collaboratoreCandidatoPo.getIdCollaboratore(),
+                    prenotazioneTo.getDataPrenotazione()
+            );
+
             if (collaboratoreSelezionatoPo == null || caricoCollaboratore < caricoMinore) {
                 collaboratoreSelezionatoPo = collaboratoreCandidatoPo;
                 caricoMinore = caricoCollaboratore;
             }
         }
+
         if (collaboratoreSelezionatoPo == null) {
             throw new ServiceException(AppError.NESSUN_COLLABORATORE_DISPONIBILE);
         }
+
         return collaboratoreSelezionatoPo;
     }
 
@@ -328,13 +386,12 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             throw new ServiceException(AppError.ID_NON_VALIDO);
         }
 
-        if (!prenotazioneRepository.existsById(idPrenotazione)) {
-            throw new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA);
-        }
+        recuperaPrenotazioneConLock(idPrenotazione);
 
         try {
             prenotazioneRepository.deleteById(idPrenotazione);
             return new EsitoResponse("Prenotazione eliminata correttamente");
+
         } catch (Exception e) {
             throw new ServiceException(AppError.PRENOTAZIONE_ELIMINAZIONE_FALLITA, e);
         }
@@ -348,16 +405,11 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             throw new ServiceException(AppError.ID_NON_VALIDO);
         }
 
-        PrenotazionePo prenotazionePo = prenotazioneRepository
-                .findById(idPrenotazione)
-                .orElse(null);
-
-        if (prenotazionePo == null) {
-            throw new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA);
-        }
+        PrenotazionePo prenotazionePo = recuperaPrenotazioneConLock(idPrenotazione);
 
         if (prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.CONFERMATA
                 && prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.DA_RIPROGRAMMARE) {
+
             throw new ServiceException(AppError.PRENOTAZIONE_NON_ANNULLABILE);
         }
 
@@ -382,16 +434,11 @@ public class PrenotazioneServiceImpl implements PrenotazioneService {
             throw new ServiceException(AppError.ID_NON_VALIDO);
         }
 
-        PrenotazionePo prenotazionePo = prenotazioneRepository
-                .findById(idPrenotazione)
-                .orElse(null);
-
-        if (prenotazionePo == null) {
-            throw new ServiceException(AppError.PRENOTAZIONE_NON_TROVATA);
-        }
+        PrenotazionePo prenotazionePo = recuperaPrenotazioneConLock(idPrenotazione);
 
         if (prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.CONFERMATA
                 && prenotazionePo.getStatoPrenotazione() != StatoPrenotazione.DA_RIPROGRAMMARE) {
+
             throw new ServiceException(AppError.PRENOTAZIONE_NON_ANNULLABILE);
         }
 

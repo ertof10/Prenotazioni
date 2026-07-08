@@ -3,11 +3,15 @@ package com.prenotazioni.controller;
 import com.prenotazioni.dto.AssenzaCollaboratoreTo;
 import com.prenotazioni.response.EsitoResponse;
 import com.prenotazioni.service.AssenzaCollaboratoreService;
+import com.prenotazioni.validation.ValidationGroups;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/assenze-collaboratori")
 public class AssenzaCollaboratoreController {
@@ -19,8 +23,17 @@ public class AssenzaCollaboratoreController {
     }
 
     @PostMapping("/inserimento")
-    public ResponseEntity<AssenzaCollaboratoreTo> saveOrUpdateAssenzaCollaboratore(
-            @RequestBody AssenzaCollaboratoreTo assenzaCollaboratoreTo) {
+    public ResponseEntity<AssenzaCollaboratoreTo> inserimentoAssenzaCollaboratore(
+            @Validated(ValidationGroups.Create.class) @RequestBody AssenzaCollaboratoreTo assenzaCollaboratoreTo) {
+
+        return ResponseEntity.ok(
+                assenzaCollaboratoreService.saveOrUpdateAssenzaCollaboratore(assenzaCollaboratoreTo)
+        );
+    }
+
+    @PutMapping("/modifica")
+    public ResponseEntity<AssenzaCollaboratoreTo> modificaAssenzaCollaboratore(
+            @Validated(ValidationGroups.Update.class) @RequestBody AssenzaCollaboratoreTo assenzaCollaboratoreTo) {
 
         return ResponseEntity.ok(
                 assenzaCollaboratoreService.saveOrUpdateAssenzaCollaboratore(assenzaCollaboratoreTo)
@@ -29,7 +42,7 @@ public class AssenzaCollaboratoreController {
 
     @GetMapping("/cerca-per-id/{idAssenzaCollaboratore}")
     public ResponseEntity<AssenzaCollaboratoreTo> getAssenzaCollaboratoreById(
-            @PathVariable("idAssenzaCollaboratore") Integer idAssenzaCollaboratore) {
+            @PathVariable @Min(1) Integer idAssenzaCollaboratore) {
 
         return ResponseEntity.ok(
                 assenzaCollaboratoreService.getAssenzaCollaboratoreById(idAssenzaCollaboratore)
@@ -45,7 +58,7 @@ public class AssenzaCollaboratoreController {
 
     @GetMapping("/stampa-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<AssenzaCollaboratoreTo>> getAssenzeByCollaboratore(
-            @PathVariable("idCollaboratore") Integer idCollaboratore) {
+            @PathVariable @Min(1) Integer idCollaboratore) {
 
         return ResponseEntity.ok(
                 assenzaCollaboratoreService.getAssenzeByCollaboratore(idCollaboratore)
@@ -54,7 +67,7 @@ public class AssenzaCollaboratoreController {
 
     @DeleteMapping("/elimina/{idAssenzaCollaboratore}")
     public ResponseEntity<EsitoResponse> deleteAssenzaCollaboratore(
-            @PathVariable("idAssenzaCollaboratore") Integer idAssenzaCollaboratore) {
+            @PathVariable @Min(1) Integer idAssenzaCollaboratore) {
 
         return ResponseEntity.ok(
                 assenzaCollaboratoreService.deleteAssenzaCollaboratore(idAssenzaCollaboratore)

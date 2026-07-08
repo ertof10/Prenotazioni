@@ -3,12 +3,15 @@ package com.prenotazioni.controller;
 import com.prenotazioni.dto.CollaboratoreTo;
 import com.prenotazioni.response.EsitoResponse;
 import com.prenotazioni.service.CollaboratoreService;
+import com.prenotazioni.validation.ValidationGroups;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/collaboratore")
 public class CollaboratoreController {
@@ -20,27 +23,37 @@ public class CollaboratoreController {
     }
 
     @PostMapping("/inserimento")
-    public ResponseEntity<CollaboratoreTo> inserimentoCollaboratore(@Valid @RequestBody CollaboratoreTo collaboratoreTo) {
+    public ResponseEntity<CollaboratoreTo> inserimentoCollaboratore(
+            @Validated(ValidationGroups.Create.class) @RequestBody CollaboratoreTo collaboratoreTo) {
+
         return ResponseEntity.ok(collaboratoreService.saveOrUpdateCollaboratore(collaboratoreTo));
     }
 
     @PutMapping("/modifica")
-    public ResponseEntity<CollaboratoreTo> modificaCollaboratore(@Valid @RequestBody CollaboratoreTo collaboratoreTo) {
+    public ResponseEntity<CollaboratoreTo> modificaCollaboratore(
+            @Validated(ValidationGroups.Update.class) @RequestBody CollaboratoreTo collaboratoreTo) {
+
         return ResponseEntity.ok(collaboratoreService.saveOrUpdateCollaboratore(collaboratoreTo));
     }
 
     @PutMapping("/disattiva/{idCollaboratore}")
-    public ResponseEntity<CollaboratoreTo> disattivaCollaboratore(@PathVariable Integer idCollaboratore) {
+    public ResponseEntity<CollaboratoreTo> disattivaCollaboratore(
+            @PathVariable @Min(1) Integer idCollaboratore) {
+
         return ResponseEntity.ok(collaboratoreService.disattivaCollaboratore(idCollaboratore));
     }
 
     @PutMapping("/riattiva/{idCollaboratore}")
-    public ResponseEntity<CollaboratoreTo> riattivaCollaboratore(@PathVariable Integer idCollaboratore) {
+    public ResponseEntity<CollaboratoreTo> riattivaCollaboratore(
+            @PathVariable @Min(1) Integer idCollaboratore) {
+
         return ResponseEntity.ok(collaboratoreService.riattivaCollaboratore(idCollaboratore));
     }
 
     @GetMapping("/cerca-per-id/{idCollaboratore}")
-    public ResponseEntity<CollaboratoreTo> cercaCollaboratorePerId(@PathVariable Integer idCollaboratore) {
+    public ResponseEntity<CollaboratoreTo> cercaCollaboratorePerId(
+            @PathVariable @Min(1) Integer idCollaboratore) {
+
         return ResponseEntity.ok(collaboratoreService.getCollaboratoreById(idCollaboratore));
     }
 
@@ -55,7 +68,9 @@ public class CollaboratoreController {
     }
 
     @DeleteMapping("/elimina-per-id/{idCollaboratore}")
-    public ResponseEntity<EsitoResponse> eliminaCollaboratore(@PathVariable Integer idCollaboratore) {
+    public ResponseEntity<EsitoResponse> eliminaCollaboratore(
+            @PathVariable @Min(1) Integer idCollaboratore) {
+
         return ResponseEntity.ok(collaboratoreService.deleteCollaboratore(idCollaboratore));
     }
 }

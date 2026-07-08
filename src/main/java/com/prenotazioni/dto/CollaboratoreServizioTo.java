@@ -1,10 +1,14 @@
 package com.prenotazioni.dto;
 
+import com.prenotazioni.validation.ValidationGroups;
 import lombok.Data;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,28 +16,36 @@ import java.time.LocalDateTime;
 @Data
 public class CollaboratoreServizioTo {
 
+    @Null(groups = ValidationGroups.Create.class)
+    @NotNull(groups = ValidationGroups.Update.class)
+    @Min(value = 1, groups = ValidationGroups.Update.class)
     private Integer idCollaboratoreServizio;
 
-    @NotNull(message = "L'id collaboratore è obbligatorio")
+    @NotNull(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Min(value = 1, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private Integer idCollaboratore;
 
-    @NotNull(message = "L'id servizio è obbligatorio")
+    @NotNull(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Min(value = 1, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private Integer idServizio;
 
+    @Null(groups = ValidationGroups.Create.class)
     private Boolean attivoCollaboratoreServizio;
 
-    @Min(value = 1, message = "La durata personalizzata deve essere almeno di 1 minuto")
+    @Min(value = 1, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Max(value = 1440, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private Integer durataPersonalizzataMinuti;
 
-    @DecimalMin(value = "0.00", message = "Il prezzo personalizzato non può essere negativo")
+    @DecimalMin(value = "0.00", groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Digits(integer = 8, fraction = 2, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private BigDecimal prezzoPersonalizzato;
 
-    @Size(max = 500, message = "Note collaboratore servizio troppo lunghe")
+    @Size(max = 500, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String noteCollaboratoreServizio;
 
+    @Null(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private LocalDateTime dataCreazioneCollaboratoreServizio;
 
+    @Null(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private LocalDateTime dataModificaCollaboratoreServizio;
-
-
 }

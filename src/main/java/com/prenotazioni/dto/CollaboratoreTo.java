@@ -1,45 +1,58 @@
 package com.prenotazioni.dto;
 
+import com.prenotazioni.validation.ValidationGroups;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
 public class CollaboratoreTo {
 
+    @Null(groups = ValidationGroups.Create.class)
+    @NotNull(groups = ValidationGroups.Update.class)
+    @Min(value = 1, groups = ValidationGroups.Update.class)
     private Integer idCollaboratore;
 
-    @NotBlank(message = "Il nome collaboratore è obbligatorio")
-    @Size(max = 60, message = "Nome collaboratore troppo lungo")
+    @NotBlank(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Size(max = 60, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String nomeCollaboratore;
 
-    @NotBlank(message = "Il cognome collaboratore è obbligatorio")
-    @Size(max = 60, message = "Cognome collaboratore troppo lungo")
+    @NotBlank(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Size(max = 60, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String cognomeCollaboratore;
 
-    @NotBlank(message = "L'email collaboratore è obbligatoria")
-    @Email(message = "Formato email collaboratore non valido")
-    @Size(max = 120, message = "Email collaboratore troppo lunga")
+    @NotBlank(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Email(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Size(max = 120, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String emailCollaboratore;
 
-    @Size(max = 20, message = "Telefono collaboratore troppo lungo")
+    @Size(max = 20, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Pattern(
+            regexp = "^$|^[+]?[0-9\\s().-]{6,20}$",
+            groups = {ValidationGroups.Create.class, ValidationGroups.Update.class}
+    )
     private String telefonoCollaboratore;
 
-    @NotBlank(message = "La specializzazione collaboratore è obbligatoria")
-    @Size(max = 100, message = "Specializzazione collaboratore troppo lunga")
+    @NotBlank(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @Size(max = 100, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String specializzazioneCollaboratore;
 
-    @Size(max = 500, message = "Descrizione collaboratore troppo lunga")
+    @Size(max = 500, groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private String descrizioneCollaboratore;
 
+    @Null(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private Boolean attivoCollaboratore;
 
+    @Null(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private LocalDateTime dataCreazioneCollaboratore;
 
+    @Null(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
     private LocalDateTime dataModificaCollaboratore;
-
-
 }

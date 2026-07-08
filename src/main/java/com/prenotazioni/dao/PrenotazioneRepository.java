@@ -3,16 +3,27 @@ package com.prenotazioni.dao;
 import com.prenotazioni.enums.StatoPrenotazione;
 import com.prenotazioni.po.PrenotazionePo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.LockModeType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PrenotazioneRepository extends JpaRepository<PrenotazionePo, Integer> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT prenotazionePo " +
+            "FROM PrenotazionePo prenotazionePo " +
+            "WHERE prenotazionePo.idPrenotazione = :idPrenotazione")
+    Optional<PrenotazionePo> findByIdForUpdate(
+            @Param("idPrenotazione") Integer idPrenotazione
+    );
 
     List<PrenotazionePo> findByUtentePo_IdUtente(Integer idUtente);
 
