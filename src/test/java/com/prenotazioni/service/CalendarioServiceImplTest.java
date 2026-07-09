@@ -14,6 +14,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -177,17 +181,27 @@ class CalendarioServiceImplTest {
     }
 
     @Test
-    void getAllCalendari_quandoPresenti_restituisceLista() {
+    void getAllCalendari_quandoPresenti_restituiscePagina() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         CalendarioPo calendarioPo = new CalendarioPo();
         calendarioPo.setIdCalendario(1);
+
         CalendarioTo calendarioTo = new CalendarioTo();
         calendarioTo.setIdCalendario(1);
-        when(calendarioRepository.findAll()).thenReturn(Collections.singletonList(calendarioPo));
+
+        when(calendarioRepository.findAll(pageable))
+                .thenReturn(new PageImpl<>(Collections.singletonList(calendarioPo), pageable, 1));
+
         when(calendarioMapper.toDto(calendarioPo)).thenReturn(calendarioTo);
-        List<CalendarioTo> risultato = calendarioService.getAllCalendari();
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdCalendario());
-        verify(calendarioRepository).findAll();
+
+        Page<CalendarioTo> risultato = calendarioService.getAllCalendari(pageable);
+
+        assertEquals(1, risultato.getTotalElements());
+        assertEquals(1, risultato.getContent().size());
+        assertEquals(1, risultato.getContent().get(0).getIdCalendario());
+
+        verify(calendarioRepository).findAll(pageable);
     }
 
     @Test

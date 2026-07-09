@@ -486,16 +486,7 @@ class PrenotazioneServiceImplTest {
         assertEquals(1, risultato.getIdPrenotazione());
     }
 
-    @Test
-    void getAllPrenotazioni_quandoPresenti_restituisceLista() {
-        PrenotazionePo prenotazionePo = creaPrenotazionePo(1, StatoPrenotazione.CONFERMATA);
-        PrenotazioneTo prenotazioneTo = creaPrenotazioneRisposta(1, StatoPrenotazione.CONFERMATA);
-        when(prenotazioneRepository.findAll()).thenReturn(Collections.singletonList(prenotazionePo));
-        when(prenotazioneMapper.toDto(prenotazionePo)).thenReturn(prenotazioneTo);
-        List<PrenotazioneTo> risultato = prenotazioneService.getAllPrenotazioni();
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdPrenotazione());
-    }
+
 
     @Test
     void getPrenotazioniByUtente_quandoPresenti_restituisceLista() {

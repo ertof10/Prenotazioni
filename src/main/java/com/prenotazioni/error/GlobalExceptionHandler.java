@@ -59,13 +59,12 @@ public class GlobalExceptionHandler {
 
         AppError appError = ex.getError();
 
-        log.warn(
-                "Errore applicativo | metodo={} | uri={} | errore={} | messaggio={}",
+        log.warn("Errore applicativo gestito | metodo={} | uri={} | errore={} | status={} | messaggio={}",
                 request.getMethod(),
                 request.getRequestURI(),
                 appError.name(),
-                appError.getMessage()
-        );
+                appError.getStatus().value(),
+                appError.getMessage());
 
         return creaResponseEntity(appError, appError.getMessage());
     }
@@ -78,12 +77,11 @@ public class GlobalExceptionHandler {
         AppError appError = AppError.ERRORE_VALIDAZIONE;
         String message = estraiMessaggioValidazioneDto(ex, appError);
 
-        log.warn(
-                "Errore validazione DTO | metodo={} | uri={} | messaggio={}",
+        log.warn("Errore validazione DTO | metodo={} | uri={} | status={} | messaggio={}",
                 request.getMethod(),
                 request.getRequestURI(),
-                message
-        );
+                appError.getStatus().value(),
+                message);
 
         return creaResponseEntity(appError, message);
     }
@@ -96,12 +94,11 @@ public class GlobalExceptionHandler {
         AppError appError = AppError.ERRORE_VALIDAZIONE;
         String message = estraiMessaggioValidazioneParametro(ex, appError);
 
-        log.warn(
-                "Errore validazione parametro | metodo={} | uri={} | messaggio={}",
+        log.warn("Errore validazione parametro | metodo={} | uri={} | status={} | messaggio={}",
                 request.getMethod(),
                 request.getRequestURI(),
-                message
-        );
+                appError.getStatus().value(),
+                message);
 
         return creaResponseEntity(appError, message);
     }
@@ -113,12 +110,11 @@ public class GlobalExceptionHandler {
 
         AppError appError = AppError.ERRORE_VALIDAZIONE;
 
-        log.warn(
-                "Errore lettura richiesta | metodo={} | uri={} | exception={}",
+        log.warn("Errore lettura body richiesta | metodo={} | uri={} | status={} | exception={}",
                 request.getMethod(),
                 request.getRequestURI(),
-                ex.getClass().getSimpleName()
-        );
+                appError.getStatus().value(),
+                ex.getClass().getSimpleName());
 
         return creaResponseEntity(appError, RICHIESTA_MALFORMATA);
     }
@@ -131,13 +127,12 @@ public class GlobalExceptionHandler {
         AppError appError = AppError.ERRORE_VALIDAZIONE;
         String message = creaMessaggioParametroNonValido(ex);
 
-        log.warn(
-                "Errore conversione parametro | metodo={} | uri={} | parametro={} | valore={}",
+        log.warn("Errore conversione parametro | metodo={} | uri={} | status={} | parametro={} | valore={}",
                 request.getMethod(),
                 request.getRequestURI(),
+                appError.getStatus().value(),
                 ex.getName(),
-                ex.getValue()
-        );
+                ex.getValue());
 
         return creaResponseEntity(appError, message);
     }
@@ -149,12 +144,11 @@ public class GlobalExceptionHandler {
 
         AppError appError = AppError.METODO_NON_SUPPORTATO;
 
-        log.warn(
-                "Metodo HTTP non supportato | metodo={} | uri={} | metodiSupportati={}",
+        log.warn("Metodo HTTP non supportato | metodo={} | uri={} | status={} | metodiSupportati={}",
                 ex.getMethod(),
                 request.getRequestURI(),
-                ex.getSupportedHttpMethods()
-        );
+                appError.getStatus().value(),
+                ex.getSupportedHttpMethods());
 
         return creaResponseEntity(appError, appError.getMessage());
     }
@@ -166,18 +160,18 @@ public class GlobalExceptionHandler {
 
         AppError appError = AppError.ERRORE_GENERICO;
 
-        log.error(
-                "Errore imprevisto | metodo={} | uri={} | exception={}",
+        log.error("Errore imprevisto non gestito | metodo={} | uri={} | status={} | exception={}",
                 request.getMethod(),
                 request.getRequestURI(),
+                appError.getStatus().value(),
                 ex.getClass().getSimpleName(),
-                ex
-        );
+                ex);
 
         return creaResponseEntity(appError, appError.getMessage());
     }
 
     private ResponseEntity<ErrorResponse> creaResponseEntity(AppError appError, String message) {
+
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(clock),
                 appError.getStatus().value(),
@@ -200,9 +194,15 @@ public class GlobalExceptionHandler {
             return appError.getMessage();
         }
 
+        String constraintName = fieldError.getCode();
+
+        if (constraintName == null || constraintName.trim().isEmpty()) {
+            return creaMessaggioCampo(fieldError.getField(), SUFFIX_NON_VALIDO);
+        }
+
         return creaMessaggioValidazione(
                 fieldError.getField(),
-                fieldError.getCode()
+                constraintName
         );
     }
 
@@ -243,54 +243,58 @@ public class GlobalExceptionHandler {
 
     private String creaMessaggioValidazione(String fieldName, String constraintName) {
 
-        if (fieldName == null || fieldName.trim().isEmpty()) {
+        String nomeCampo = fieldName.trim();
+
+        if (nomeCampo.isEmpty()) {
             return RICHIESTA_NON_VALIDA;
         }
 
-        if (constraintName == null || constraintName.trim().isEmpty()) {
-            return creaMessaggioCampo(fieldName, SUFFIX_NON_VALIDO);
+        String nomeVincolo = constraintName.trim();
+
+        if (nomeVincolo.isEmpty()) {
+            return creaMessaggioCampo(nomeCampo, SUFFIX_NON_VALIDO);
         }
 
-        switch (constraintName) {
+        switch (nomeVincolo) {
             case "NotBlank":
             case "NotNull":
-                return creaMessaggioCampo(fieldName, SUFFIX_OBBLIGATORIO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_OBBLIGATORIO);
 
             case "Null":
-                return creaMessaggioCampo(fieldName, SUFFIX_NON_DEVE_ESSERE_VALORIZZATO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_NON_DEVE_ESSERE_VALORIZZATO);
 
             case "Min":
-                return creaMessaggioCampo(fieldName, SUFFIX_MAGGIORE_ZERO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_MAGGIORE_ZERO);
 
             case "Max":
-                return creaMessaggioCampo(fieldName, SUFFIX_MASSIMO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_MASSIMO);
 
             case "Email":
-                return creaMessaggioCampo(fieldName, SUFFIX_EMAIL_NON_VALIDA);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_EMAIL_NON_VALIDA);
 
             case "Size":
-                return creaMessaggioCampo(fieldName, SUFFIX_LUNGHEZZA_MASSIMA);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_LUNGHEZZA_MASSIMA);
 
             case "Pattern":
-                return creaMessaggioCampo(fieldName, SUFFIX_FORMATO_NON_VALIDO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_FORMATO_NON_VALIDO);
 
             case "FutureOrPresent":
-                return creaMessaggioCampo(fieldName, SUFFIX_DATA_PASSATO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_DATA_PASSATO);
 
             case "Positive":
-                return creaMessaggioCampo(fieldName, SUFFIX_POSITIVO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_POSITIVO);
 
             case "PositiveOrZero":
-                return creaMessaggioCampo(fieldName, SUFFIX_POSITIVO_O_ZERO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_POSITIVO_O_ZERO);
 
             case "DecimalMin":
-                return creaMessaggioCampo(fieldName, SUFFIX_DECIMALE_MINIMO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_DECIMALE_MINIMO);
 
             case "Digits":
-                return creaMessaggioCampo(fieldName, SUFFIX_NUMERO_NON_VALIDO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_NUMERO_NON_VALIDO);
 
             default:
-                return creaMessaggioCampo(fieldName, SUFFIX_NON_VALIDO);
+                return creaMessaggioCampo(nomeCampo, SUFFIX_NON_VALIDO);
         }
     }
 

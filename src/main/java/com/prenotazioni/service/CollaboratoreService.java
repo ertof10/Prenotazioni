@@ -2,6 +2,8 @@ package com.prenotazioni.service;
 
 import com.prenotazioni.dto.CollaboratoreTo;
 import com.prenotazioni.response.EsitoResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,7 +13,7 @@ public interface CollaboratoreService {
 
     CollaboratoreTo getCollaboratoreById(Integer idCollaboratore);
 
-    List<CollaboratoreTo> getAllCollaboratori();
+    Page<CollaboratoreTo> getAllCollaboratori(Pageable pageable);
 
     List<CollaboratoreTo> getCollaboratoriAttivi();
 

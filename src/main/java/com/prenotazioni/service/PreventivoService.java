@@ -2,10 +2,11 @@ package com.prenotazioni.service;
 
 import com.prenotazioni.dto.PreventivoTo;
 import com.prenotazioni.response.EsitoResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PreventivoService {
+
     PreventivoTo richiediPreventivo(PreventivoTo preventivoTo);
 
     PreventivoTo modificaPreventivo(PreventivoTo preventivoTo);
@@ -20,11 +21,11 @@ public interface PreventivoService {
 
     PreventivoTo getPreventivoById(Integer idPreventivo);
 
-    List<PreventivoTo> getAllPreventivi();
+    Page<PreventivoTo> getAllPreventivi(Pageable pageable);
 
-    List<PreventivoTo> getPreventiviByUtente(Integer idUtente);
+    Page<PreventivoTo> getPreventiviByUtente(Integer idUtente, Pageable pageable);
 
-    List<PreventivoTo> getPreventiviByStato(String statoPreventivo);
+    Page<PreventivoTo> getPreventiviByStato(String statoPreventivo, Pageable pageable);
 
     EsitoResponse deletePreventivo(Integer idPreventivo);
 

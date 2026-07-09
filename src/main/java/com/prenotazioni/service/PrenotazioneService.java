@@ -2,6 +2,8 @@ package com.prenotazioni.service;
 
 import com.prenotazioni.dto.PrenotazioneTo;
 import com.prenotazioni.response.EsitoResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,7 +13,7 @@ public interface PrenotazioneService {
 
     PrenotazioneTo getPrenotazioneById(Integer idPrenotazione);
 
-    List<PrenotazioneTo> getAllPrenotazioni();
+    Page<PrenotazioneTo> getAllPrenotazioni(Pageable pageable);
 
     List<PrenotazioneTo> getPrenotazioniByUtente(Integer idUtente);
 

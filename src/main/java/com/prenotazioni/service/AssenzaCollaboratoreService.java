@@ -2,6 +2,7 @@ package com.prenotazioni.service;
 
 import com.prenotazioni.dto.AssenzaCollaboratoreTo;
 import com.prenotazioni.response.EsitoResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface AssenzaCollaboratoreService {
 
     AssenzaCollaboratoreTo getAssenzaCollaboratoreById(Integer idAssenzaCollaboratore);
 
-    List<AssenzaCollaboratoreTo> getAllAssenzeCollaboratori();
+    Page<AssenzaCollaboratoreTo> getAllAssenzeCollaboratori(org.springframework.data.domain.Pageable pageable);
 
     List<AssenzaCollaboratoreTo> getAssenzeByCollaboratore(Integer idCollaboratore);
 

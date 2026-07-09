@@ -18,6 +18,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -186,17 +190,27 @@ class CollaboratoreServizioServiceImplTest {
     }
 
     @Test
-    void getAllCollaboratoriServizi_quandoPresenti_restituisceLista() {
+    void getAllCollaboratoriServizi_quandoPresenti_restituiscePagina() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         CollaboratoreServizioPo collaboratoreServizioPo = new CollaboratoreServizioPo();
         collaboratoreServizioPo.setIdCollaboratoreServizio(1);
+
         CollaboratoreServizioTo collaboratoreServizioTo = new CollaboratoreServizioTo();
         collaboratoreServizioTo.setIdCollaboratoreServizio(1);
-        when(collaboratoreServizioRepository.findAll()).thenReturn(Collections.singletonList(collaboratoreServizioPo));
+
+        when(collaboratoreServizioRepository.findAll(pageable))
+                .thenReturn(new PageImpl<>(Collections.singletonList(collaboratoreServizioPo), pageable, 1));
+
         when(collaboratoreServizioMapper.toDto(collaboratoreServizioPo)).thenReturn(collaboratoreServizioTo);
-        List<CollaboratoreServizioTo> risultato = collaboratoreServizioService.getAllCollaboratoriServizi();
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdCollaboratoreServizio());
-        verify(collaboratoreServizioRepository).findAll();
+
+        Page<CollaboratoreServizioTo> risultato = collaboratoreServizioService.getAllCollaboratoriServizi(pageable);
+
+        assertEquals(1, risultato.getTotalElements());
+        assertEquals(1, risultato.getContent().size());
+        assertEquals(1, risultato.getContent().get(0).getIdCollaboratoreServizio());
+
+        verify(collaboratoreServizioRepository).findAll(pageable);
     }
 
     @Test

@@ -1,10 +1,9 @@
 package com.prenotazioni.service;
 
-
 import com.prenotazioni.dto.UtenteTo;
 import com.prenotazioni.response.EsitoResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UtenteService {
 
@@ -12,7 +11,7 @@ public interface UtenteService {
 
     UtenteTo getUtenteById(Integer idUtente);
 
-    List<UtenteTo> getAllUtenti();
+    Page<UtenteTo> getAllUtenti(Pageable pageable);
 
     EsitoResponse deleteUtente(Integer idUtente);
 

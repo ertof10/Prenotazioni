@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -537,60 +541,91 @@ class PreventivoServiceImplTest {
     }
 
     @Test
-    void getAllPreventivi_quandoPresenti_restituisceLista() {
+    void getAllPreventivi_quandoPresenti_restituiscePagina() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         PreventivoPo preventivoPo = creaPreventivoPo(1, StatoPreventivo.RICHIESTO);
         PreventivoTo preventivoTo = creaPreventivoRisposta(1);
-        when(preventivoRepository.findAll()).thenReturn(Collections.singletonList(preventivoPo));
+
+        when(preventivoRepository.findAll(pageable))
+                .thenReturn(new PageImpl<>(Collections.singletonList(preventivoPo), pageable, 1));
+
         when(preventivoMapper.toDto(preventivoPo)).thenReturn(preventivoTo);
-        List<PreventivoTo> risultato = preventivoService.getAllPreventivi();
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdPreventivo());
+
+        Page<PreventivoTo> risultato = preventivoService.getAllPreventivi(pageable);
+
+        assertEquals(1, risultato.getTotalElements());
+        assertEquals(1, risultato.getContent().size());
+        assertEquals(1, risultato.getContent().get(0).getIdPreventivo());
+
+        verify(preventivoRepository).findAll(pageable);
     }
 
     @Test
     void getPreventiviByUtente_quandoIdNonValido_lanciaServiceException() {
-        ServiceException exception = assertThrows(ServiceException.class, () -> preventivoService.getPreventiviByUtente(0));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ServiceException exception = assertThrows(
+                ServiceException.class,
+                () -> preventivoService.getPreventiviByUtente(0, pageable)
+        );
+
         assertEquals(AppError.ID_NON_VALIDO, exception.getError());
         verifyNoInteractions(preventivoRepository);
     }
 
     @Test
     void getPreventiviByUtente_quandoUtenteNonEsiste_lanciaServiceException() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         when(utenteRepository.existsById(3)).thenReturn(false);
-        ServiceException exception = assertThrows(ServiceException.class, () -> preventivoService.getPreventiviByUtente(3));
+
+        ServiceException exception = assertThrows(
+                ServiceException.class,
+                () -> preventivoService.getPreventiviByUtente(3, pageable)
+        );
+
         assertEquals(AppError.UTENTE_NON_TROVATO, exception.getError());
         verifyNoInteractions(preventivoRepository);
     }
 
     @Test
-    void getPreventiviByUtente_quandoPresenti_restituisceLista() {
+    void getPreventiviByUtente_quandoPresenti_restituiscePagina() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         PreventivoPo preventivoPo = creaPreventivoPo(1, StatoPreventivo.RICHIESTO);
         PreventivoTo preventivoTo = creaPreventivoRisposta(1);
+
         when(utenteRepository.existsById(3)).thenReturn(true);
-        when(preventivoRepository.findByUtentePo_IdUtente(3)).thenReturn(Collections.singletonList(preventivoPo));
+
+        when(preventivoRepository.findByUtentePo_IdUtente(3, pageable))
+                .thenReturn(new PageImpl<>(Collections.singletonList(preventivoPo), pageable, 1));
+
         when(preventivoMapper.toDto(preventivoPo)).thenReturn(preventivoTo);
-        List<PreventivoTo> risultato = preventivoService.getPreventiviByUtente(3);
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdPreventivo());
+
+        Page<PreventivoTo> risultato = preventivoService.getPreventiviByUtente(3, pageable);
+
+        assertEquals(1, risultato.getTotalElements());
+        assertEquals(1, risultato.getContent().size());
+        assertEquals(1, risultato.getContent().get(0).getIdPreventivo());
+
+        verify(preventivoRepository).findByUtentePo_IdUtente(3, pageable);
     }
 
     @Test
     void getPreventiviByStato_quandoStatoNonValido_lanciaServiceException() {
-        ServiceException exception = assertThrows(ServiceException.class, () -> preventivoService.getPreventiviByStato("stato_sbagliato"));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        ServiceException exception = assertThrows(
+                ServiceException.class,
+                () -> preventivoService.getPreventiviByStato("stato_sbagliato", pageable)
+        );
+
         assertEquals(AppError.STATO_PREVENTIVO_NON_VALIDO, exception.getError());
         verifyNoInteractions(preventivoRepository);
     }
 
-    @Test
-    void getPreventiviByStato_quandoValido_restituisceLista() {
-        PreventivoPo preventivoPo = creaPreventivoPo(1, StatoPreventivo.RICHIESTO);
-        PreventivoTo preventivoTo = creaPreventivoRisposta(1);
-        when(preventivoRepository.findByStatoPreventivo(StatoPreventivo.RICHIESTO)).thenReturn(Collections.singletonList(preventivoPo));
-        when(preventivoMapper.toDto(preventivoPo)).thenReturn(preventivoTo);
-        List<PreventivoTo> risultato = preventivoService.getPreventiviByStato("richiesto");
-        assertEquals(1, risultato.size());
-        assertEquals(1, risultato.get(0).getIdPreventivo());
-    }
+
 
     @Test
     void deletePreventivo_quandoIdNonValido_lanciaServiceException() {
