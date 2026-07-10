@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class PreventivoController {
         this.preventivoService = preventivoService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isUtenteAutenticato(#preventivoTo.idUtente)")
     @PostMapping("/richiesta")
     public ResponseEntity<PreventivoTo> richiediPreventivo(
             @Validated(ValidationGroups.Create.class) @RequestBody PreventivoTo preventivoTo) {
@@ -53,6 +55,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.richiediPreventivo(preventivoTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/modifica")
     public ResponseEntity<PreventivoTo> modificaPreventivo(
             @Validated(ValidationGroups.Update.class) @RequestBody PreventivoTo preventivoTo) {
@@ -65,6 +68,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.modificaPreventivo(preventivoTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/prendi-in-lavorazione/{idPreventivo}")
     public ResponseEntity<PreventivoTo> prendiInLavorazionePreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -74,6 +78,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.prendiInLavorazionePreventivo(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/invia/{idPreventivo}")
     public ResponseEntity<PreventivoTo> inviaPreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -83,6 +88,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.inviaPreventivo(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isPreventivoDiUtenteAutenticato(#idPreventivo)")
     @PutMapping("/accetta/{idPreventivo}")
     public ResponseEntity<PreventivoTo> accettaPreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -92,6 +98,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.accettaPreventivo(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isPreventivoDiUtenteAutenticato(#idPreventivo)")
     @PutMapping("/rifiuta/{idPreventivo}")
     public ResponseEntity<PreventivoTo> rifiutaPreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -101,6 +108,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.rifiutaPreventivo(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isPreventivoDiUtenteAutenticato(#idPreventivo)")
     @GetMapping("/cerca-per-id/{idPreventivo}")
     public ResponseEntity<PreventivoTo> cercaPreventivoPerId(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -110,6 +118,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.getPreventivoById(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<PreventivoTo>> stampaTuttiPreventivi(
             @PageableDefault(
@@ -126,6 +135,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.getAllPreventivi(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isUtenteAutenticato(#idUtente)")
     @GetMapping("/stampa-per-utente/{idUtente}")
     public ResponseEntity<Page<PreventivoTo>> stampaPreventiviPerUtente(
             @PathVariable @Min(1) Integer idUtente,
@@ -144,6 +154,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.getPreventiviByUtente(idUtente, pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-per-stato/{statoPreventivo}")
     public ResponseEntity<Page<PreventivoTo>> stampaPreventiviPerStato(
             @PathVariable @NotBlank String statoPreventivo,
@@ -162,6 +173,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.getPreventiviByStato(statoPreventivo, pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idPreventivo}")
     public ResponseEntity<EsitoResponse> eliminaPreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {
@@ -171,6 +183,7 @@ public class PreventivoController {
         return ResponseEntity.ok(preventivoService.deletePreventivo(idPreventivo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/chiudi-manualmente/{idPreventivo}")
     public ResponseEntity<PreventivoTo> chiudiManualmentePreventivo(
             @PathVariable @Min(1) Integer idPreventivo) {

@@ -12,8 +12,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Min;
 
@@ -34,6 +42,7 @@ public class ServizioController {
         this.servizioService = servizioService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/inserimento")
     public ResponseEntity<ServizioTo> inserimentoServizio(
             @Validated(ValidationGroups.Create.class) @RequestBody ServizioTo servizioTo) {
@@ -45,6 +54,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.saveOrUpdateServizio(servizioTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/modifica")
     public ResponseEntity<ServizioTo> modificaServizio(
             @Validated(ValidationGroups.Update.class) @RequestBody ServizioTo servizioTo) {
@@ -57,6 +67,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.saveOrUpdateServizio(servizioTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/disattiva/{idServizio}")
     public ResponseEntity<ServizioTo> disattivaServizio(
             @PathVariable @Min(1) Integer idServizio) {
@@ -66,6 +77,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.disattivaServizio(idServizio));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/riattiva/{idServizio}")
     public ResponseEntity<ServizioTo> riattivaServizio(
             @PathVariable @Min(1) Integer idServizio) {
@@ -75,6 +87,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.riattivaServizio(idServizio));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'UTENTE', 'COLLABORATORE')")
     @GetMapping("/cerca-per-id/{idServizio}")
     public ResponseEntity<ServizioTo> cercaServizioPerId(
             @PathVariable @Min(1) Integer idServizio) {
@@ -84,6 +97,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.getServizioById(idServizio));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<ServizioTo>> stampaTuttiServizi(
             @PageableDefault(
@@ -100,6 +114,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.getAllServizi(pageable));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'UTENTE', 'COLLABORATORE')")
     @GetMapping("/stampa-attivi")
     public ResponseEntity<Page<ServizioTo>> stampaServiziAttivi(
             @PageableDefault(
@@ -116,6 +131,7 @@ public class ServizioController {
         return ResponseEntity.ok(servizioService.getServiziAttivi(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idServizio}")
     public ResponseEntity<EsitoResponse> eliminaServizio(
             @PathVariable @Min(1) Integer idServizio) {

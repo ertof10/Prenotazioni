@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class AssenzaCollaboratoreController {
         this.assenzaCollaboratoreService = assenzaCollaboratoreService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#assenzaCollaboratoreTo.idCollaboratore)")
     @PostMapping("/inserimento")
     public ResponseEntity<AssenzaCollaboratoreTo> inserimentoAssenzaCollaboratore(
             @Validated(ValidationGroups.Create.class) @RequestBody AssenzaCollaboratoreTo assenzaCollaboratoreTo) {
@@ -56,6 +58,7 @@ public class AssenzaCollaboratoreController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#assenzaCollaboratoreTo.idCollaboratore)")
     @PutMapping("/modifica")
     public ResponseEntity<AssenzaCollaboratoreTo> modificaAssenzaCollaboratore(
             @Validated(ValidationGroups.Update.class) @RequestBody AssenzaCollaboratoreTo assenzaCollaboratoreTo) {
@@ -71,6 +74,7 @@ public class AssenzaCollaboratoreController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/cerca-per-id/{idAssenzaCollaboratore}")
     public ResponseEntity<AssenzaCollaboratoreTo> getAssenzaCollaboratoreById(
             @PathVariable @Min(1) Integer idAssenzaCollaboratore) {
@@ -83,6 +87,7 @@ public class AssenzaCollaboratoreController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<AssenzaCollaboratoreTo>> getAllAssenzeCollaboratori(
             @PageableDefault(
@@ -101,6 +106,7 @@ public class AssenzaCollaboratoreController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#idCollaboratore)")
     @GetMapping("/stampa-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<AssenzaCollaboratoreTo>> getAssenzeByCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -112,6 +118,7 @@ public class AssenzaCollaboratoreController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina/{idAssenzaCollaboratore}")
     public ResponseEntity<EsitoResponse> deleteAssenzaCollaboratore(
             @PathVariable @Min(1) Integer idAssenzaCollaboratore) {

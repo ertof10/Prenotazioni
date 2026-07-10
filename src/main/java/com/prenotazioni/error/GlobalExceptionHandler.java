@@ -3,6 +3,8 @@ package com.prenotazioni.error;
 import com.prenotazioni.response.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
+import org.springframework.security.access.AccessDeniedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -28,10 +30,9 @@ public class GlobalExceptionHandler {
     private static final String RICHIESTA_NON_VALIDA = "Richiesta non valida";
     private static final String RICHIESTA_MALFORMATA = "Richiesta malformata o non leggibile";
     private static final String PARAMETRO_NON_VALIDO = "Parametro non valido";
-
+    private static final String ORDINAMENTO_NON_VALIDO = "Parametro sort non valido";
     private static final String CAMPO_PREFIX = "Il campo '";
     private static final String CAMPO_SEPARATOR = "' ";
-
     private static final String SUFFIX_NON_VALIDO = "non è valido";
     private static final String SUFFIX_OBBLIGATORIO = "è obbligatorio";
     private static final String SUFFIX_NON_DEVE_ESSERE_VALORIZZATO = "non deve essere valorizzato";
@@ -52,6 +53,38 @@ public class GlobalExceptionHandler {
         this.clock = clock;
     }
 
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyReferenceException(
+            PropertyReferenceException ex,
+            HttpServletRequest request) {
+
+        AppError appError = AppError.ERRORE_VALIDAZIONE;
+
+        log.warn("Errore parametro sort | metodo={} | uri={} | status={} | proprieta={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                appError.getStatus().value(),
+                ex.getPropertyName());
+
+        return creaResponseEntity(appError, ORDINAMENTO_NON_VALIDO);
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccessApiUsageException(
+            InvalidDataAccessApiUsageException ex,
+            HttpServletRequest request) {
+
+        AppError appError = AppError.ERRORE_VALIDAZIONE;
+
+        log.warn("Errore richiesta dati non valida | metodo={} | uri={} | status={} | exception={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                appError.getStatus().value(),
+                ex.getClass().getSimpleName());
+
+        return creaResponseEntity(appError, ORDINAMENTO_NON_VALIDO);
+    }
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ErrorResponse> handleServiceException(
             ServiceException ex,
@@ -149,6 +182,22 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 appError.getStatus().value(),
                 ex.getSupportedHttpMethods());
+
+        return creaResponseEntity(appError, appError.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+
+        AppError appError = AppError.ACCESSO_NEGATO;
+
+        log.warn("Accesso negato | metodo={} | uri={} | status={} | messaggio={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                appError.getStatus().value(),
+                ex.getMessage());
 
         return creaResponseEntity(appError, appError.getMessage());
     }

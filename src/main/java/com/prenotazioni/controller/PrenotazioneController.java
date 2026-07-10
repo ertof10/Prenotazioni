@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class PrenotazioneController {
         this.prenotazioneService = prenotazioneService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isUtenteAutenticato(#prenotazioneTo.idUtente)")
     @PostMapping("/inserimento")
     public ResponseEntity<PrenotazioneTo> inserimentoPrenotazione(
             @Validated(ValidationGroups.Create.class) @RequestBody PrenotazioneTo prenotazioneTo) {
@@ -55,6 +57,9 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.saveOrUpdatePrenotazione(prenotazioneTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(@accessoSecurityService.isUtenteAutenticato(#prenotazioneTo.idUtente) and " +
+            "@accessoSecurityService.isPrenotazioneDiUtenteAutenticato(#prenotazioneTo.idPrenotazione))")
     @PutMapping("/modifica")
     public ResponseEntity<PrenotazioneTo> modificaPrenotazione(
             @Validated(ValidationGroups.Update.class) @RequestBody PrenotazioneTo prenotazioneTo) {
@@ -69,6 +74,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.saveOrUpdatePrenotazione(prenotazioneTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isPrenotazioneDiUtenteAutenticato(#idPrenotazione)")
     @PutMapping("/utente-annulla-prenotazione/{idPrenotazione}")
     public ResponseEntity<PrenotazioneTo> utenteAnnullaPrenotazione(
             @PathVariable @Min(1) Integer idPrenotazione) {
@@ -78,6 +84,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.utenteAnnullaPrenotazione(idPrenotazione));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/struttura-annulla-prenotazione/{idPrenotazione}")
     public ResponseEntity<PrenotazioneTo> strutturaAnnullaPrenotazione(
             @PathVariable @Min(1) Integer idPrenotazione) {
@@ -87,6 +94,9 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.strutturaAnnullaPrenotazione(idPrenotazione));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "@accessoSecurityService.isPrenotazioneDiUtenteAutenticato(#idPrenotazione) or " +
+            "@accessoSecurityService.isPrenotazioneDiCollaboratoreAutenticato(#idPrenotazione)")
     @GetMapping("/cerca-per-id/{idPrenotazione}")
     public ResponseEntity<PrenotazioneTo> cercaPrenotazionePerId(
             @PathVariable @Min(1) Integer idPrenotazione) {
@@ -96,6 +106,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.getPrenotazioneById(idPrenotazione));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-da-riprogrammare")
     public ResponseEntity<List<PrenotazioneTo>> stampaPrenotazioniDaRiprogrammare() {
 
@@ -104,6 +115,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.getPrenotazioniDaRiprogrammare());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-da-riprogrammare-per-utente/{idUtente}")
     public ResponseEntity<List<PrenotazioneTo>> stampaPrenotazioniDaRiprogrammarePerUtente(
             @PathVariable @Min(1) Integer idUtente) {
@@ -113,6 +125,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.getPrenotazioniDaRiprogrammareByUtente(idUtente));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<PrenotazioneTo>> stampaTuttePrenotazioni(
             @PageableDefault(
@@ -129,6 +142,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.getAllPrenotazioni(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isUtenteAutenticato(#idUtente)")
     @GetMapping("/stampa-per-utente/{idUtente}")
     public ResponseEntity<List<PrenotazioneTo>> stampaPrenotazioniPerUtente(
             @PathVariable @Min(1) Integer idUtente) {
@@ -138,6 +152,7 @@ public class PrenotazioneController {
         return ResponseEntity.ok(prenotazioneService.getPrenotazioniByUtente(idUtente));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idPrenotazione}")
     public ResponseEntity<EsitoResponse> eliminaPrenotazione(
             @PathVariable @Min(1) Integer idPrenotazione) {

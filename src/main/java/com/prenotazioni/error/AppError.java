@@ -12,7 +12,14 @@ public enum AppError {
     EMAIL_NON_VALIDA(HttpStatus.BAD_REQUEST, "Email non valida"),
     EMAIL_GIA_PRESENTE(HttpStatus.BAD_REQUEST, "Email già presente"),
     RUOLO_NON_VALIDO(HttpStatus.BAD_REQUEST, "Ruolo non valido"),
-
+    CREDENZIALI_NON_VALIDE(HttpStatus.UNAUTHORIZED, "Credenziali non valide"),
+    TOKEN_NON_VALIDO(HttpStatus.UNAUTHORIZED, "Token non valido"),
+    TOKEN_SCADUTO(HttpStatus.UNAUTHORIZED, "Token scaduto"),
+    ACCESSO_NEGATO(HttpStatus.FORBIDDEN, "Accesso negato"),
+    ACCOUNT_NON_TROVATO(HttpStatus.NOT_FOUND, "Account non trovato"),
+    ACCOUNT_NON_ATTIVO(HttpStatus.UNAUTHORIZED, "Account non attivo"),
+    ACCOUNT_GIA_PRESENTE(HttpStatus.BAD_REQUEST, "Account già presente"),
+    ACCOUNT_CREAZIONE_FALLITA(HttpStatus.INTERNAL_SERVER_ERROR, "Creazione account fallita"),
 
     // =========================
     // UTENTE

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class CollaboratoreServizioController {
         this.collaboratoreServizioService = collaboratoreServizioService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/inserimento")
     public ResponseEntity<CollaboratoreServizioTo> inserimentoCollaboratoreServizio(
             @Validated(ValidationGroups.Create.class) @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
@@ -55,6 +57,7 @@ public class CollaboratoreServizioController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/modifica")
     public ResponseEntity<CollaboratoreServizioTo> modificaCollaboratoreServizio(
             @Validated(ValidationGroups.Update.class) @RequestBody CollaboratoreServizioTo collaboratoreServizioTo) {
@@ -69,6 +72,7 @@ public class CollaboratoreServizioController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/cerca-per-id/{idCollaboratoreServizio}")
     public ResponseEntity<CollaboratoreServizioTo> cercaCollaboratoreServizioPerId(
             @PathVariable @Min(1) Integer idCollaboratoreServizio) {
@@ -81,6 +85,7 @@ public class CollaboratoreServizioController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<CollaboratoreServizioTo>> stampaTuttiCollaboratoriServizi(
             @PageableDefault(
@@ -97,6 +102,7 @@ public class CollaboratoreServizioController {
         return ResponseEntity.ok(collaboratoreServizioService.getAllCollaboratoriServizi(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#idCollaboratore)")
     @GetMapping("/stampa-servizi-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<CollaboratoreServizioTo>> stampaServiziPerCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -108,6 +114,7 @@ public class CollaboratoreServizioController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'UTENTE')")
     @GetMapping("/stampa-collaboratori-per-servizio/{idServizio}")
     public ResponseEntity<List<CollaboratoreServizioTo>> stampaCollaboratoriPerServizio(
             @PathVariable @Min(1) Integer idServizio) {
@@ -119,6 +126,7 @@ public class CollaboratoreServizioController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idCollaboratoreServizio}")
     public ResponseEntity<EsitoResponse> eliminaCollaboratoreServizio(
             @PathVariable @Min(1) Integer idCollaboratoreServizio) {

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class CollaboratoreController {
         this.collaboratoreService = collaboratoreService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/inserimento")
     public ResponseEntity<CollaboratoreTo> inserimentoCollaboratore(
             @Validated(ValidationGroups.Create.class) @RequestBody CollaboratoreTo collaboratoreTo) {
@@ -52,6 +54,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.saveOrUpdateCollaboratore(collaboratoreTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#collaboratoreTo.idCollaboratore)")
     @PutMapping("/modifica")
     public ResponseEntity<CollaboratoreTo> modificaCollaboratore(
             @Validated(ValidationGroups.Update.class) @RequestBody CollaboratoreTo collaboratoreTo) {
@@ -63,6 +66,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.saveOrUpdateCollaboratore(collaboratoreTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/disattiva/{idCollaboratore}")
     public ResponseEntity<CollaboratoreTo> disattivaCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -72,6 +76,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.disattivaCollaboratore(idCollaboratore));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/riattiva/{idCollaboratore}")
     public ResponseEntity<CollaboratoreTo> riattivaCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -81,6 +86,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.riattivaCollaboratore(idCollaboratore));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('UTENTE') or @accessoSecurityService.isCollaboratoreAutenticato(#idCollaboratore)")
     @GetMapping("/cerca-per-id/{idCollaboratore}")
     public ResponseEntity<CollaboratoreTo> cercaCollaboratorePerId(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -90,6 +96,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.getCollaboratoreById(idCollaboratore));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<CollaboratoreTo>> stampaTuttiCollaboratori(
             @PageableDefault(
@@ -106,6 +113,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.getAllCollaboratori(pageable));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'UTENTE')")
     @GetMapping("/stampa-attivi")
     public ResponseEntity<List<CollaboratoreTo>> stampaCollaboratoriAttivi() {
 
@@ -114,6 +122,7 @@ public class CollaboratoreController {
         return ResponseEntity.ok(collaboratoreService.getCollaboratoriAttivi());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idCollaboratore}")
     public ResponseEntity<EsitoResponse> eliminaCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {

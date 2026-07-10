@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class CalendarioController {
         this.calendarioService = calendarioService;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#calendarioTo.idCollaboratore)")
     @PostMapping("/inserimento")
     public ResponseEntity<CalendarioTo> inserimentoCalendario(
             @Validated(ValidationGroups.Create.class) @RequestBody CalendarioTo calendarioTo) {
@@ -53,6 +55,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.saveOrUpdateCalendario(calendarioTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#calendarioTo.idCollaboratore)")
     @PutMapping("/modifica")
     public ResponseEntity<CalendarioTo> modificaCalendario(
             @Validated(ValidationGroups.Update.class) @RequestBody CalendarioTo calendarioTo) {
@@ -65,6 +68,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.saveOrUpdateCalendario(calendarioTo));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/cerca-per-id/{idCalendario}")
     public ResponseEntity<CalendarioTo> cercaCalendarioPerId(
             @PathVariable @Min(1) Integer idCalendario) {
@@ -74,6 +78,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.getCalendarioById(idCalendario));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-tutti")
     public ResponseEntity<Page<CalendarioTo>> stampaTuttiCalendari(
             @PageableDefault(
@@ -90,6 +95,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.getAllCalendari(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stampa-attivi")
     public ResponseEntity<List<CalendarioTo>> stampaCalendariAttivi() {
 
@@ -98,6 +104,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.getCalendariAttivi());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @accessoSecurityService.isCollaboratoreAutenticato(#idCollaboratore)")
     @GetMapping("/stampa-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<CalendarioTo>> stampaCalendariPerCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -107,6 +114,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.getCalendariByCollaboratore(idCollaboratore));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'UTENTE') or @accessoSecurityService.isCollaboratoreAutenticato(#idCollaboratore)")
     @GetMapping("/stampa-attivi-per-collaboratore/{idCollaboratore}")
     public ResponseEntity<List<CalendarioTo>> stampaCalendariAttiviPerCollaboratore(
             @PathVariable @Min(1) Integer idCollaboratore) {
@@ -116,6 +124,7 @@ public class CalendarioController {
         return ResponseEntity.ok(calendarioService.getCalendariAttiviByCollaboratore(idCollaboratore));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/elimina-per-id/{idCalendario}")
     public ResponseEntity<EsitoResponse> eliminaCalendario(
             @PathVariable @Min(1) Integer idCalendario) {
