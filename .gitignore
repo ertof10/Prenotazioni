@@ -44,3 +44,8 @@ prenotazioni-frontend/dist/
 
 # IDE local files
 .idea/copilotDiffState.xml
+
+
+backup_gestione_prenotazioni.sql
+schema_gestione_prenotazioni.sql
+src/main/resources/db/migration_old/
