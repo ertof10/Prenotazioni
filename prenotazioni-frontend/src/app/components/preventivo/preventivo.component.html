@@ -1,0 +1,83 @@
+<section class="page-section">
+
+  <div class="page-header">
+    <div>
+      <h2>Preventivi</h2>
+      <p>Elenco dei preventivi presenti nel gestionale.</p>
+    </div>
+
+    <button type="button">
+      Nuovo preventivo
+    </button>
+  </div>
+
+  <div *ngIf="caricamento">
+    Caricamento preventivi...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <table *ngIf="!caricamento && preventivi.length > 0" class="data-table">
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Utente</th>
+        <th>Servizio</th>
+        <th>Richiesta</th>
+        <th>Importo</th>
+        <th>Stato</th>
+        <th>Data richiesta</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let preventivo of preventivi">
+
+        <td>{{ preventivo.idPreventivo }}</td>
+
+        <td>
+          <span *ngIf="preventivo.nomeUtente || preventivo.cognomeUtente">
+            {{ preventivo.nomeUtente || '' }}
+            {{ preventivo.cognomeUtente || '' }}
+          </span>
+
+          <span *ngIf="!preventivo.nomeUtente && !preventivo.cognomeUtente">
+            ID {{ preventivo.idUtente }}
+          </span>
+        </td>
+
+        <td>
+          <span *ngIf="preventivo.nomeServizio">
+            {{ preventivo.nomeServizio }}
+          </span>
+
+          <span *ngIf="!preventivo.nomeServizio">
+            {{ preventivo.idServizio ? 'ID ' + preventivo.idServizio : '-' }}
+          </span>
+        </td>
+
+        <td>
+          {{ preventivo.descrizioneRichiesta || preventivo.descrizionePreventivo || '-' }}
+        </td>
+
+        <td>
+          {{ preventivo.importoPreventivo !== undefined && preventivo.importoPreventivo !== null ? preventivo.importoPreventivo + ' €' : '-' }}
+        </td>
+
+        <td>{{ preventivo.statoPreventivo }}</td>
+
+        <td>{{ preventivo.dataRichiesta || '-' }}</td>
+
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div *ngIf="!caricamento && preventivi.length === 0">
+    Nessun preventivo presente.
+  </div>
+
+</section>

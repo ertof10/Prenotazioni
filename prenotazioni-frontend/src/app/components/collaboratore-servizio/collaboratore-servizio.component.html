@@ -1,0 +1,73 @@
+<section class="page-section">
+
+  <div class="page-header">
+    <div>
+      <h2>Collaboratore - Servizio</h2>
+      <p>Elenco delle associazioni tra collaboratori e servizi.</p>
+    </div>
+
+    <button type="button">
+      Nuova associazione
+    </button>
+  </div>
+
+  <div *ngIf="caricamento">
+    Caricamento associazioni...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <table *ngIf="!caricamento && associazioni.length > 0" class="data-table">
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>ID Collaboratore</th>
+        <th>Collaboratore</th>
+        <th>ID Servizio</th>
+        <th>Servizio</th>
+        <th>Prezzo</th>
+        <th>Durata</th>
+        <th>Note</th>
+        <th>Attivo</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let associazione of associazioni">
+        <td>{{ associazione.idCollaboratoreServizio }}</td>
+
+        <td>{{ associazione.idCollaboratore }}</td>
+
+        <td>
+          {{ associazione.nomeCollaboratore || '-' }}
+          {{ associazione.cognomeCollaboratore || '' }}
+        </td>
+
+        <td>{{ associazione.idServizio }}</td>
+
+        <td>{{ associazione.nomeServizio || '-' }}</td>
+
+        <td>
+          {{ associazione.prezzo !== undefined && associazione.prezzo !== null ? associazione.prezzo + ' €' : '-' }}
+        </td>
+
+        <td>
+          {{ associazione.durata !== undefined && associazione.durata !== null ? associazione.durata + ' min' : '-' }}
+        </td>
+
+        <td>{{ associazione.note || '-' }}</td>
+
+        <td>{{ associazione.attivo ? 'Sì' : 'No' }}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div *ngIf="!caricamento && associazioni.length === 0">
+    Nessuna associazione presente.
+  </div>
+
+</section>

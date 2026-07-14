@@ -1,0 +1,26 @@
+<header class="topbar">
+
+  <div class="topbar-left">
+    <span class="topbar-kicker">
+      Area di controllo
+    </span>
+  </div>
+
+  <div class="topbar-right">
+
+    <div class="topbar-user">
+
+      <div class="topbar-avatar">
+        {{ email ? (email.charAt(0) | uppercase) : 'A' }}
+      </div>
+
+      <div class="topbar-user-info">
+        <span class="topbar-user-email">{{ email }}</span>
+        <span class="topbar-user-role">{{ ruolo }}</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</header>

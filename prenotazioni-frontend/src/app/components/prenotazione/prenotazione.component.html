@@ -1,0 +1,214 @@
+<section class="booking-page">
+
+  <div class="booking-page-header">
+
+    <div class="booking-heading">
+      <h1>Prenotazioni</h1>
+      <p>
+        Consulta e gestisci gli appuntamenti registrati, con stato, orari, cliente e collaboratore assegnato.
+      </p>
+    </div>
+
+    <button type="button" class="primary-action-button">
+      Nuova prenotazione
+    </button>
+
+  </div>
+
+  <div *ngIf="caricamento" class="loading-message">
+    Caricamento prenotazioni...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <div *ngIf="!caricamento && prenotazioni.length > 0" class="booking-table-shell">
+
+    <table class="booking-table">
+
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Servizio</th>
+          <th>Collaboratore</th>
+          <th>Data</th>
+          <th>Ora inizio</th>
+          <th>Ora fine</th>
+          <th>Stato</th>
+          <th class="actions-column">Azioni</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let prenotazione of prenotazioni">
+
+          <td>
+            <div class="person-cell">
+              <div class="person-avatar">
+                {{ getCliente(prenotazione).charAt(0).toUpperCase() }}
+              </div>
+
+              <div>
+                <strong>{{ getCliente(prenotazione) }}</strong>
+                <span>{{ prenotazione.emailUtente || 'Email non disponibile' }}</span>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <strong class="service-name">
+              {{ getServizio(prenotazione) }}
+            </strong>
+          </td>
+
+          <td>
+            <span class="collaborator-name">
+              {{ getCollaboratore(prenotazione) }}
+            </span>
+          </td>
+
+          <td>
+            <span class="date-value">
+              {{ prenotazione.dataPrenotazione }}
+            </span>
+          </td>
+
+          <td>
+            <span class="time-pill">
+              {{ prenotazione.oraInizio }}
+            </span>
+          </td>
+
+          <td>
+            <span class="time-pill">
+              {{ prenotazione.oraFine }}
+            </span>
+          </td>
+
+          <td>
+            <span
+              class="status-badge"
+              [class.status-success]="getClasseStato(prenotazione.statoPrenotazione) === 'status-success'"
+              [class.status-danger]="getClasseStato(prenotazione.statoPrenotazione) === 'status-danger'"
+              [class.status-warning]="getClasseStato(prenotazione.statoPrenotazione) === 'status-warning'"
+              [class.status-info]="getClasseStato(prenotazione.statoPrenotazione) === 'status-info'"
+              [class.status-muted]="getClasseStato(prenotazione.statoPrenotazione) === 'status-muted'">
+              {{ prenotazione.statoPrenotazione || 'Non definito' }}
+            </span>
+          </td>
+
+          <td class="actions-column">
+            <button
+              type="button"
+              class="secondary-action-button"
+              (click)="apriGestionePrenotazione(prenotazione)">
+              Gestisci
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div *ngIf="!caricamento && prenotazioni.length === 0" class="empty-message">
+    Nessuna prenotazione presente.
+  </div>
+
+  <div class="booking-modal-overlay" *ngIf="prenotazioneSelezionata as prenotazioneDettaglio">
+
+    <div class="booking-modal">
+
+      <div class="booking-modal-header">
+
+        <div>
+          <span>Gestione prenotazione</span>
+          <h2>
+            {{ getCliente(prenotazioneDettaglio) }}
+          </h2>
+          <p>
+            {{ getServizio(prenotazioneDettaglio) }} · {{ prenotazioneDettaglio.dataPrenotazione }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close-button"
+          (click)="chiudiGestionePrenotazione()">
+          Chiudi
+        </button>
+
+      </div>
+
+      <div class="booking-modal-body">
+
+        <div class="detail-grid">
+
+          <div class="detail-card">
+            <span>Cliente</span>
+            <strong>{{ getCliente(prenotazioneDettaglio) }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Servizio</span>
+            <strong>{{ getServizio(prenotazioneDettaglio) }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Collaboratore</span>
+            <strong>{{ getCollaboratore(prenotazioneDettaglio) }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Data appuntamento</span>
+            <strong>{{ prenotazioneDettaglio.dataPrenotazione }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Ora inizio</span>
+            <strong>{{ prenotazioneDettaglio.oraInizio }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Ora fine</span>
+            <strong>{{ prenotazioneDettaglio.oraFine }}</strong>
+          </div>
+
+          <div class="detail-card">
+            <span>Stato</span>
+            <strong>{{ prenotazioneDettaglio.statoPrenotazione || 'Non definito' }}</strong>
+          </div>
+
+          <div class="detail-card full-width">
+            <span>Note</span>
+            <strong>{{ prenotazioneDettaglio.note || 'Nessuna nota presente.' }}</strong>
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+          <button type="button" class="secondary-action-button">
+            Riprogramma
+          </button>
+
+          <button type="button" class="danger-action-button">
+            Annulla prenotazione
+          </button>
+
+          <button type="button" class="primary-action-button">
+            Salva modifiche
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

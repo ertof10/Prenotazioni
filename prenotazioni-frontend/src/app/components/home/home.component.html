@@ -1,0 +1,150 @@
+<section class="home-page">
+
+  <header class="home-header">
+
+    <div class="home-brand">
+
+      <div class="home-logo" *ngIf="!urlLogoVisualizzato">
+        {{ nomeVisualizzato.charAt(0).toUpperCase() }}
+      </div>
+
+      <img
+        *ngIf="urlLogoVisualizzato"
+        class="home-logo-image"
+        [src]="urlLogoVisualizzato"
+        [alt]="nomeVisualizzato">
+
+      <div>
+        <strong>{{ nomeVisualizzato }}</strong>
+        <span>Booking experience</span>
+      </div>
+
+    </div>
+
+    <a [routerLink]="['/login']">
+      Area riservata
+    </a>
+
+  </header>
+
+  <main class="home-hero">
+
+    <div class="home-content">
+
+      <div class="home-kicker">
+        Prenotazioni online
+      </div>
+
+      <h1>
+        {{ testoHomeVisualizzato }}
+      </h1>
+
+      <p>
+        {{ descrizioneVisualizzata }}
+      </p>
+
+      <div class="home-actions">
+
+        <a [routerLink]="['/login']" class="home-primary-action">
+          Accedi
+        </a>
+
+        <a href="#features" class="home-secondary-action">
+          Scopri servizi
+        </a>
+
+      </div>
+
+      <div class="home-contact" *ngIf="impostazioni">
+
+        <div *ngIf="impostazioni.telefonoContatto">
+          <span>Telefono</span>
+          <strong>{{ impostazioni.telefonoContatto }}</strong>
+        </div>
+
+        <div *ngIf="impostazioni.emailContatto">
+          <span>Email</span>
+          <strong>{{ impostazioni.emailContatto }}</strong>
+        </div>
+
+        <div *ngIf="impostazioni.indirizzo">
+          <span>Indirizzo</span>
+          <strong>{{ impostazioni.indirizzo }}</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="home-visual">
+
+      <img
+        *ngIf="urlImmagineHomeVisualizzata"
+        [src]="urlImmagineHomeVisualizzata"
+        [alt]="nomeVisualizzato">
+
+      <div *ngIf="!urlImmagineHomeVisualizzata" class="home-preview-card">
+
+        <div class="preview-header">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="preview-title">
+          <h3>{{ nomeVisualizzato }}</h3>
+          <p>Gestione appuntamenti</p>
+        </div>
+
+        <div class="preview-body">
+
+          <div class="preview-stat">
+            <strong>24/7</strong>
+            <span>Prenotazioni</span>
+          </div>
+
+          <div class="preview-stat">
+            <strong>Smart</strong>
+            <span>Calendario</span>
+          </div>
+
+          <div class="preview-stat">
+            <strong>Pro</strong>
+            <span>Servizi</span>
+          </div>
+
+        </div>
+
+        <div class="preview-calendar">
+          <div class="preview-calendar-row active"></div>
+          <div class="preview-calendar-row"></div>
+          <div class="preview-calendar-row"></div>
+          <div class="preview-calendar-row short"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <section id="features" class="home-features">
+
+    <div class="feature-card">
+      <h3>Prenotazioni semplici</h3>
+      <p>Consulta disponibilità, servizi e appuntamenti in modo rapido.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Servizi chiari</h3>
+      <p>Ogni servizio può essere presentato con descrizione, durata, prezzo e immagine.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Area riservata</h3>
+      <p>Clienti, staff e admin accedono a funzioni dedicate.</p>
+    </div>
+
+  </section>
+
+</section>

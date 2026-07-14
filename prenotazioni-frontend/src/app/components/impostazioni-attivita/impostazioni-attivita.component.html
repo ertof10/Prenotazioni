@@ -1,0 +1,158 @@
+<section class="page-section">
+
+  <div class="page-header">
+    <div>
+      <h2>Impostazioni attività</h2>
+      <p>Configurazione generale dell’attività, della home pubblica e delle regole operative.</p>
+    </div>
+  </div>
+
+  <form class="settings-form" (ngSubmit)="salvaImpostazioni()">
+
+    <div class="settings-card">
+
+      <h3>Dati attività</h3>
+
+      <div class="form-grid">
+
+        <div class="form-field">
+          <label>Nome attività</label>
+          <input
+            type="text"
+            name="nomeAttivita"
+            [(ngModel)]="impostazioni.nomeAttivita">
+        </div>
+
+        <div class="form-field">
+          <label>Email contatto</label>
+          <input
+            type="email"
+            name="emailContatto"
+            [(ngModel)]="impostazioni.emailContatto">
+        </div>
+
+        <div class="form-field">
+          <label>Telefono contatto</label>
+          <input
+            type="text"
+            name="telefonoContatto"
+            [(ngModel)]="impostazioni.telefonoContatto">
+        </div>
+
+        <div class="form-field">
+          <label>Sito web</label>
+          <input
+            type="text"
+            name="sitoWeb"
+            [(ngModel)]="impostazioni.sitoWeb">
+        </div>
+
+      </div>
+
+      <div class="form-field">
+        <label>Indirizzo</label>
+        <input
+          type="text"
+          name="indirizzo"
+          [(ngModel)]="impostazioni.indirizzo">
+      </div>
+
+      <div class="form-field">
+        <label>Descrizione attività</label>
+        <textarea
+          name="descrizioneAttivita"
+          rows="4"
+          [(ngModel)]="impostazioni.descrizioneAttivita">
+        </textarea>
+      </div>
+
+    </div>
+
+    <div class="settings-card">
+
+      <h3>Personalizzazione home pubblica</h3>
+
+      <div class="form-grid">
+
+        <div class="form-field">
+          <label>URL logo</label>
+          <input
+            type="text"
+            name="urlLogo"
+            [(ngModel)]="impostazioni.urlLogo">
+        </div>
+
+        <div class="form-field">
+          <label>URL immagine home</label>
+          <input
+            type="text"
+            name="urlImmagineHome"
+            [(ngModel)]="impostazioni.urlImmagineHome">
+        </div>
+
+      </div>
+
+      <div class="form-field">
+        <label>Testo home</label>
+        <textarea
+          name="testoHome"
+          rows="5"
+          [(ngModel)]="impostazioni.testoHome">
+        </textarea>
+      </div>
+
+    </div>
+
+    <div class="settings-card">
+
+      <h3>Regole operative</h3>
+
+      <div class="form-grid">
+
+        <div class="form-field">
+          <label>Anticipo minimo prenotazione in ore</label>
+          <input
+            type="number"
+            name="anticipoMinimoPrenotazioneOre"
+            [(ngModel)]="impostazioni.anticipoMinimoPrenotazioneOre">
+        </div>
+
+        <div class="form-field">
+          <label>Limite annullamento in ore</label>
+          <input
+            type="number"
+            name="limiteAnnullamentoOre"
+            [(ngModel)]="impostazioni.limiteAnnullamentoOre">
+        </div>
+
+        <div class="form-field">
+          <label>Durata slot in minuti</label>
+          <input
+            type="number"
+            name="durataSlotMinuti"
+            [(ngModel)]="impostazioni.durataSlotMinuti">
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+
+      <button type="submit">
+        Salva impostazioni
+      </button>
+
+      <a [routerLink]="['/dashboard']">
+        Torna alla dashboard
+      </a>
+
+    </div>
+
+    <div *ngIf="messaggioSalvataggio" class="success-message">
+      {{ messaggioSalvataggio }}
+    </div>
+
+  </form>
+
+</section>

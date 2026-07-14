@@ -1,0 +1,84 @@
+<section class="login-page">
+
+  <div class="login-background">
+
+    <div class="login-brand-panel">
+
+      <div class="login-logo">
+        BP
+      </div>
+
+      <h1>BookingPro</h1>
+
+      <p>
+        Gestionale prenotazioni moderno per aziende, studi professionali,
+        team operativi e attività con appuntamenti.
+      </p>
+
+      <div class="login-highlights">
+
+        <div>
+          <span>01</span>
+          <strong>Calendario intelligente</strong>
+        </div>
+
+        <div>
+          <span>02</span>
+          <strong>Clienti, staff e servizi</strong>
+        </div>
+
+        <div>
+          <span>03</span>
+          <strong>Dashboard enterprise</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="login-card">
+
+      <div class="login-card-header">
+        <h2>Accedi</h2>
+        <p>Entra nel pannello operativo.</p>
+      </div>
+
+      <form (ngSubmit)="login()" class="login-form">
+
+        <div class="login-field">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="admin@prenotazioni.local">
+        </div>
+
+        <div class="login-field">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Password">
+        </div>
+
+        <button type="submit">
+          Accedi al gestionale
+        </button>
+
+      </form>
+
+      <div *ngIf="erroreLogin" class="error-message">
+        {{ erroreLogin }}
+      </div>
+
+      <div class="login-footer">
+        <span>Ambiente demo locale</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

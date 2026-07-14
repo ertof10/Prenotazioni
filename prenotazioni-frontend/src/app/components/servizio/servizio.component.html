@@ -1,0 +1,120 @@
+<section class="service-page">
+
+  <div class="service-page-header">
+
+    <div class="service-heading-shell">
+      <h1 class="service-page-title">Servizi disponibili</h1>
+
+      <p class="service-page-subtitle">
+        Gestisci l’offerta della tua attività: servizi, categorie, durata, prezzo e disponibilità per i clienti.
+      </p>
+    </div>
+
+    <button type="button" class="primary-action-button">
+      Nuovo servizio
+    </button>
+
+  </div>
+
+  <div *ngIf="caricamento" class="loading-message">
+    Caricamento servizi...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <div class="service-scroll-area" *ngIf="!caricamento && servizi.length > 0">
+
+    <div class="service-list">
+
+      <article class="service-card" *ngFor="let servizio of servizi">
+
+        <div class="service-media">
+
+          <ng-container *ngIf="servizio.urlImmagineServizio; else placeholderImmagine">
+            <img
+              [src]="servizio.urlImmagineServizio"
+              [alt]="servizio.nomeServizio">
+          </ng-container>
+
+          <ng-template #placeholderImmagine>
+            <div class="service-placeholder">
+              <div class="service-placeholder-icon">
+                {{ servizio.nomeServizio ? (servizio.nomeServizio | slice:0:1) : 'S' }}
+              </div>
+            </div>
+          </ng-template>
+
+          <span class="service-category">
+            {{ servizio.categoriaServizio || 'SERVIZIO' }}
+          </span>
+
+        </div>
+
+        <div class="service-content">
+
+          <div class="service-main">
+
+            <div class="service-title-block">
+              <h2 class="service-card-title">
+                {{ servizio.nomeServizio }}
+              </h2>
+
+              <p class="service-description">
+                {{ servizio.descrizioneServizio || 'Descrizione non disponibile.' }}
+              </p>
+            </div>
+
+            <span
+              class="service-status-badge"
+              [class.inactive]="!servizio.attivoServizio">
+              {{ servizio.attivoServizio ? 'Attivo' : 'Non attivo' }}
+            </span>
+
+          </div>
+
+          <div class="service-info-grid">
+
+            <div>
+              <span>Prezzo</span>
+              <strong>{{ servizio.prezzoServizio }} €</strong>
+            </div>
+
+            <div>
+              <span>Durata</span>
+              <strong>
+                {{ servizio.durataServizio ? (servizio.durataServizio + ' min') : 'Da definire' }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Categoria</span>
+              <strong>{{ servizio.categoriaServizio || '-' }}</strong>
+            </div>
+
+          </div>
+
+          <div class="service-actions">
+            <button type="button" class="secondary-action-button">
+              Modifica
+            </button>
+
+            <button type="button" class="primary-action-button">
+              Gestisci servizio
+            </button>
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="!caricamento && servizi.length === 0" class="empty-message">
+    Nessun servizio presente.
+  </div>
+
+</section>

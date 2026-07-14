@@ -1,0 +1,105 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+
+.dashboard-card {
+  position: relative;
+  padding: 24px;
+  min-height: 150px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dashboard-card::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(6, 182, 212, 0.12));
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.dashboard-card h3 {
+  position: relative;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.dashboard-number {
+  position: relative;
+  margin: 0;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+}
+
+.dashboard-card span {
+  position: relative;
+  display: block;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-section {
+  margin-top: 32px;
+}
+
+.admin-section h3 {
+  margin-bottom: 14px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.admin-card {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.13), transparent 34%),
+    #ffffff;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.admin-card p {
+  margin: 0;
+  max-width: 720px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.admin-card-action {
+  padding: 11px 17px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--cyan));
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}

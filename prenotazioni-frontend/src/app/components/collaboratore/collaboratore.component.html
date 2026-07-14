@@ -1,0 +1,420 @@
+<section class="page-section">
+
+  <div class="page-header">
+
+    <div>
+      <h2>Staff</h2>
+      <p>Gestisci collaboratori, profili professionali, servizi, appuntamenti e assenze.</p>
+    </div>
+
+    <div class="page-actions">
+
+      <div class="view-toggle">
+        <button
+          type="button"
+          [class.active]="vistaCollaboratori === 'card'"
+          (click)="cambiaVistaCollaboratori('card')">
+          Card
+        </button>
+
+        <button
+          type="button"
+          [class.active]="vistaCollaboratori === 'tabella'"
+          (click)="cambiaVistaCollaboratori('tabella')">
+          Tabella
+        </button>
+      </div>
+
+      <button type="button" class="app-button-primary">
+        Nuovo membro staff
+      </button>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="caricamento">
+    Caricamento staff...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <div
+    *ngIf="!caricamento && collaboratori.length > 0 && vistaCollaboratori === 'card'"
+    class="staff-card-grid">
+
+    <article class="staff-card" *ngFor="let collaboratore of collaboratori">
+
+      <div class="staff-card-media">
+
+        <img
+          *ngIf="collaboratore.urlFotoCollaboratore"
+          [src]="collaboratore.urlFotoCollaboratore"
+          [alt]="collaboratore.nomeCollaboratore + ' ' + collaboratore.cognomeCollaboratore">
+
+        <div *ngIf="!collaboratore.urlFotoCollaboratore" class="staff-avatar">
+          {{ inizialiCollaboratore(collaboratore) }}
+        </div>
+
+        <span
+          class="staff-status"
+          [class.active]="collaboratore.attivoCollaboratore">
+          {{ collaboratore.attivoCollaboratore ? 'Attivo' : 'Non attivo' }}
+        </span>
+
+      </div>
+
+      <div class="staff-card-body">
+
+        <div class="staff-main-info">
+
+          <h3>
+            {{ collaboratore.nomeCollaboratore }}
+            {{ collaboratore.cognomeCollaboratore }}
+          </h3>
+
+          <p>
+            {{ collaboratore.professioneCollaboratore || collaboratore.specializzazioneCollaboratore || 'Professionista' }}
+          </p>
+
+        </div>
+
+        <div class="staff-tags">
+
+          <span>
+            {{ collaboratore.specializzazioneCollaboratore || 'Specializzazione da definire' }}
+          </span>
+
+          <span>
+            {{ collaboratore.telefonoCollaboratore || 'Telefono non presente' }}
+          </span>
+
+        </div>
+
+        <p class="staff-description">
+          {{ collaboratore.descrizioneCollaboratore || 'Profilo professionale da completare con descrizione, competenze e informazioni utili per la gestione delle prenotazioni.' }}
+        </p>
+
+        <div class="staff-card-footer">
+
+          <div>
+            <span>Email</span>
+            <strong>{{ collaboratore.emailCollaboratore }}</strong>
+          </div>
+
+          <button
+            type="button"
+            class="app-button-primary"
+            (click)="apriGestioneCollaboratore(collaboratore)">
+            Gestisci
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </div>
+
+  <table
+    *ngIf="!caricamento && collaboratori.length > 0 && vistaCollaboratori === 'tabella'"
+    class="data-table">
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Staff</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Specializzazione</th>
+        <th>Attivo</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let collaboratore of collaboratori">
+        <td>{{ collaboratore.idCollaboratore }}</td>
+
+        <td>
+          <strong>{{ collaboratore.nomeCollaboratore }} {{ collaboratore.cognomeCollaboratore }}</strong>
+        </td>
+
+        <td>{{ collaboratore.emailCollaboratore }}</td>
+
+        <td>{{ collaboratore.telefonoCollaboratore || '-' }}</td>
+
+        <td>{{ collaboratore.specializzazioneCollaboratore || '-' }}</td>
+
+        <td>
+          <span
+            class="app-badge"
+            [class.app-badge-success]="collaboratore.attivoCollaboratore"
+            [class.app-badge-muted]="!collaboratore.attivoCollaboratore">
+            {{ collaboratore.attivoCollaboratore ? 'Attivo' : 'Non attivo' }}
+          </span>
+        </td>
+
+        <td>
+          <button
+            type="button"
+            class="table-action-button"
+            (click)="apriGestioneCollaboratore(collaboratore)">
+            Gestisci
+          </button>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div *ngIf="!caricamento && collaboratori.length === 0" class="empty-state">
+    Nessun membro dello staff presente.
+  </div>
+
+  <div class="modal-overlay" *ngIf="collaboratoreSelezionato as collaboratoreDettaglio">
+
+    <div class="modal-container">
+
+      <div class="modal-header">
+
+        <div>
+          <h3>
+            Gestisci:
+            {{ collaboratoreDettaglio.nomeCollaboratore }}
+            {{ collaboratoreDettaglio.cognomeCollaboratore }}
+          </h3>
+
+          <p>
+            Profilo, servizi associati, appuntamenti futuri e assenze.
+          </p>
+        </div>
+
+        <button type="button" class="modal-close-button" (click)="chiudiGestioneCollaboratore()">
+          Chiudi
+        </button>
+
+      </div>
+
+      <div *ngIf="erroreDettaglio" class="error-message">
+        {{ erroreDettaglio }}
+      </div>
+
+      <div class="modal-tabs">
+
+        <button
+          type="button"
+          [class.active]="tabAttiva === 'profilo'"
+          (click)="cambiaTab('profilo')">
+          Profilo
+        </button>
+
+        <button
+          type="button"
+          [class.active]="tabAttiva === 'servizi'"
+          (click)="cambiaTab('servizi')">
+          Servizi
+        </button>
+
+        <button
+          type="button"
+          [class.active]="tabAttiva === 'appuntamenti'"
+          (click)="cambiaTab('appuntamenti')">
+          Appuntamenti
+        </button>
+
+        <button
+          type="button"
+          [class.active]="tabAttiva === 'assenze'"
+          (click)="cambiaTab('assenze')">
+          Assenze
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div *ngIf="tabAttiva === 'profilo'" class="tab-section">
+
+          <h4>Profilo staff</h4>
+
+          <div class="profile-grid">
+
+            <div class="profile-item">
+              <span>Nome</span>
+              <strong>{{ collaboratoreDettaglio.nomeCollaboratore }}</strong>
+            </div>
+
+            <div class="profile-item">
+              <span>Cognome</span>
+              <strong>{{ collaboratoreDettaglio.cognomeCollaboratore }}</strong>
+            </div>
+
+            <div class="profile-item">
+              <span>Email</span>
+              <strong>{{ collaboratoreDettaglio.emailCollaboratore }}</strong>
+            </div>
+
+            <div class="profile-item">
+              <span>Telefono</span>
+              <strong>{{ collaboratoreDettaglio.telefonoCollaboratore || '-' }}</strong>
+            </div>
+
+            <div class="profile-item">
+              <span>Professione</span>
+              <strong>{{ collaboratoreDettaglio.professioneCollaboratore || '-' }}</strong>
+            </div>
+
+            <div class="profile-item">
+              <span>Specializzazione</span>
+              <strong>{{ collaboratoreDettaglio.specializzazioneCollaboratore || '-' }}</strong>
+            </div>
+
+            <div class="profile-item full-profile-item">
+              <span>Descrizione</span>
+              <strong>{{ collaboratoreDettaglio.descrizioneCollaboratore || 'Descrizione non presente.' }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div *ngIf="tabAttiva === 'servizi'" class="tab-section">
+
+          <div class="tab-header">
+            <h4>Servizi associati</h4>
+
+            <button type="button">
+              Associa servizio
+            </button>
+          </div>
+
+          <table *ngIf="serviziAssociati.length > 0" class="data-table compact-table">
+
+            <thead>
+              <tr>
+                <th>Servizio</th>
+                <th>Prezzo</th>
+                <th>Durata</th>
+                <th>Attivo</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let associazione of serviziAssociati">
+                <td>{{ associazione.nomeServizio || 'ID ' + associazione.idServizio }}</td>
+                <td>{{ associazione.prezzo !== undefined && associazione.prezzo !== null ? associazione.prezzo + ' €' : '-' }}</td>
+                <td>{{ associazione.durata !== undefined && associazione.durata !== null ? associazione.durata + ' min' : '-' }}</td>
+                <td>{{ associazione.attivo ? 'Sì' : 'No' }}</td>
+              </tr>
+            </tbody>
+
+          </table>
+
+          <div *ngIf="serviziAssociati.length === 0" class="empty-state">
+            Nessun servizio associato.
+          </div>
+
+        </div>
+
+        <div *ngIf="tabAttiva === 'appuntamenti'" class="tab-section">
+
+          <h4>Appuntamenti futuri</h4>
+
+          <table *ngIf="appuntamentiCollaboratore.length > 0" class="data-table compact-table">
+
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Ora inizio</th>
+                <th>Ora fine</th>
+                <th>Servizio</th>
+                <th>Cliente</th>
+                <th>Stato</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let appuntamento of appuntamentiCollaboratore">
+                <td>{{ appuntamento.dataPrenotazione }}</td>
+                <td>{{ appuntamento.oraInizio }}</td>
+                <td>{{ appuntamento.oraFine }}</td>
+                <td>{{ appuntamento.nomeServizio || 'ID ' + appuntamento.idServizio }}</td>
+
+                <td>
+                  <span *ngIf="appuntamento.nomeUtente || appuntamento.cognomeUtente">
+                    {{ appuntamento.nomeUtente || '' }}
+                    {{ appuntamento.cognomeUtente || '' }}
+                  </span>
+
+                  <span *ngIf="!appuntamento.nomeUtente && !appuntamento.cognomeUtente">
+                    ID {{ appuntamento.idUtente }}
+                  </span>
+                </td>
+
+                <td>{{ appuntamento.statoPrenotazione }}</td>
+              </tr>
+            </tbody>
+
+          </table>
+
+          <div *ngIf="appuntamentiCollaboratore.length === 0" class="empty-state">
+            Nessun appuntamento futuro per questo membro dello staff.
+          </div>
+
+        </div>
+
+        <div *ngIf="tabAttiva === 'assenze'" class="tab-section">
+
+          <div class="tab-header">
+            <h4>Assenze staff</h4>
+
+            <button type="button">
+              Nuova assenza
+            </button>
+          </div>
+
+          <table *ngIf="assenzeCollaboratore.length > 0" class="data-table compact-table">
+
+            <thead>
+              <tr>
+                <th>Data inizio</th>
+                <th>Data fine</th>
+                <th>Ora inizio</th>
+                <th>Ora fine</th>
+                <th>Tipo</th>
+                <th>Motivo</th>
+                <th>Attiva</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let assenza of assenzeCollaboratore">
+                <td>{{ assenza.dataInizio }}</td>
+                <td>{{ assenza.dataFine }}</td>
+                <td>{{ assenza.oraInizio || '-' }}</td>
+                <td>{{ assenza.oraFine || '-' }}</td>
+                <td>{{ assenza.tipoAssenza || '-' }}</td>
+                <td>{{ assenza.motivo || assenza.note || '-' }}</td>
+                <td>{{ assenza.attivo ? 'Sì' : 'No' }}</td>
+              </tr>
+            </tbody>
+
+          </table>
+
+          <div *ngIf="assenzeCollaboratore.length === 0" class="empty-state">
+            Nessuna assenza registrata.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

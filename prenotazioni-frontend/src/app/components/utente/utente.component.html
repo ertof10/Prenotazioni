@@ -1,0 +1,69 @@
+<section class="page-section">
+
+  <div class="page-header">
+
+    <div>
+      <h2>Clienti</h2>
+      <p>Elenco dei clienti registrati nel gestionale.</p>
+    </div>
+
+    <div class="page-actions">
+      <button type="button" class="app-button-primary">
+        Nuovo cliente
+      </button>
+    </div>
+
+  </div>
+
+  <div *ngIf="caricamento">
+    Caricamento clienti...
+  </div>
+
+  <div *ngIf="errore" class="error-message">
+    {{ errore }}
+  </div>
+
+  <table *ngIf="!caricamento && utenti.length > 0" class="data-table">
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Attivo</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let utente of utenti">
+
+        <td>{{ utente.idUtente }}</td>
+
+        <td>
+          <strong>{{ utente.nomeUtente }} {{ utente.cognomeUtente }}</strong>
+        </td>
+
+        <td>{{ utente.emailUtente }}</td>
+
+        <td>{{ utente.telefonoUtente || '-' }}</td>
+
+        <td>
+          <span
+            class="app-badge"
+            [class.app-badge-success]="utente.attivoUtente"
+            [class.app-badge-muted]="!utente.attivoUtente">
+            {{ utente.attivoUtente ? 'Attivo' : 'Non attivo' }}
+          </span>
+        </td>
+
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div *ngIf="!caricamento && utenti.length === 0" class="empty-state">
+    Nessun cliente presente.
+  </div>
+
+</section>

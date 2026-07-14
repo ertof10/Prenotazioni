@@ -1,0 +1,210 @@
+<section class="calendar-page">
+
+  <div class="calendar-page-header">
+
+    <div class="calendar-heading">
+      <h1>Calendario operativo</h1>
+      <p>
+        Visualizza appuntamenti, disponibilità, slot occupati e giornate bloccate in un’unica vista.
+      </p>
+    </div>
+
+    <div class="calendar-actions">
+
+      <button type="button" class="calendar-button secondary" (click)="tornaAlMeseCorrente()">
+        Oggi
+      </button>
+
+      <button type="button" class="calendar-button primary">
+        Nuova prenotazione
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="calendar-dashboard">
+
+    <div class="calendar-stat-card">
+      <span>Appuntamenti mese</span>
+      <strong>{{ totaleAppuntamentiMese }}</strong>
+    </div>
+
+    <div class="calendar-stat-card">
+      <span>Slot liberi</span>
+      <strong>{{ totaleSlotLiberiMese }}</strong>
+    </div>
+
+    <div class="calendar-stat-card">
+      <span>Slot occupati</span>
+      <strong>{{ totaleSlotOccupatiMese }}</strong>
+    </div>
+
+    <div class="calendar-stat-card accent">
+      <span>Vista corrente</span>
+      <strong>{{ meseAnnoCorrente }}</strong>
+    </div>
+
+  </div>
+
+  <div class="calendar-workspace">
+
+    <div class="calendar-shell">
+
+      <div class="calendar-toolbar">
+
+        <button type="button" class="month-nav-button" (click)="mesePrecedente()">
+          ‹
+        </button>
+
+        <div class="month-title">
+          <span>Vista mensile</span>
+          <h2>{{ meseAnnoCorrente }}</h2>
+        </div>
+
+        <button type="button" class="month-nav-button" (click)="meseSuccessivo()">
+          ›
+        </button>
+
+      </div>
+
+      <div class="calendar-legend">
+
+        <div>
+          <span class="legend-dot available"></span>
+          Slot liberi
+        </div>
+
+        <div>
+          <span class="legend-dot busy"></span>
+          Appuntamenti
+        </div>
+
+        <div>
+          <span class="legend-dot blocked"></span>
+          Assenza / blocco
+        </div>
+
+        <div>
+          <span class="legend-dot today"></span>
+          Oggi
+        </div>
+
+      </div>
+
+      <div class="calendar-grid">
+
+        <div class="calendar-day-name" *ngFor="let nomeGiorno of nomiGiorni">
+          {{ nomeGiorno }}
+        </div>
+
+        <ng-container *ngFor="let settimana of settimane">
+
+          <button
+            type="button"
+            class="calendar-day"
+            *ngFor="let giorno of settimana"
+            [class.other-month]="!giorno.meseCorrente"
+            [class.today]="giorno.oggi"
+            [class.selected]="giorno.selezionato"
+            [class.blocked]="giorno.assenza"
+            (click)="selezionaGiorno(giorno)">
+
+            <div class="day-top">
+
+              <span class="day-number">
+                {{ giorno.numeroGiorno }}
+              </span>
+
+            </div>
+
+            <div class="day-content" *ngIf="giorno.meseCorrente">
+
+              <div class="day-pill busy-pill" *ngIf="giorno.numeroAppuntamenti > 0">
+                {{ giorno.numeroAppuntamenti }} appunt.
+              </div>
+
+              <div class="day-pill available-pill" *ngIf="giorno.slotLiberi > 0 && !giorno.assenza">
+                {{ giorno.slotLiberi }} liberi
+              </div>
+
+              <div class="day-pill blocked-pill" *ngIf="giorno.assenza">
+                Bloccato
+              </div>
+
+            </div>
+
+          </button>
+
+        </ng-container>
+
+      </div>
+
+    </div>
+
+    <aside class="selected-day-panel">
+
+      <div *ngIf="giornoSelezionato; else nessunGiorno">
+
+        <div class="selected-day-header">
+
+          <span>Giorno selezionato</span>
+
+          <h3>
+            {{ formattaData(giornoSelezionato.data) }}
+          </h3>
+
+        </div>
+
+        <div class="selected-day-summary">
+
+          <div>
+            <span>Appuntamenti</span>
+            <strong>{{ giornoSelezionato.numeroAppuntamenti }}</strong>
+          </div>
+
+          <div>
+            <span>Slot liberi</span>
+            <strong>{{ giornoSelezionato.slotLiberi }}</strong>
+          </div>
+
+          <div>
+            <span>Slot occupati</span>
+            <strong>{{ giornoSelezionato.slotOccupati }}</strong>
+          </div>
+
+        </div>
+
+        <div class="selected-day-status" *ngIf="giornoSelezionato.assenza">
+          Giornata bloccata per assenza o indisponibilità.
+        </div>
+
+        <div class="selected-day-actions">
+
+          <button type="button" class="calendar-button primary">
+            Gestisci slot
+          </button>
+
+          <button type="button" class="calendar-button secondary">
+            Vedi prenotazioni
+          </button>
+
+        </div>
+
+        <div class="selected-day-note">
+          Questa vista sarà collegata a prenotazioni reali, assenze collaboratore e disponibilità generate dal backend.
+        </div>
+
+      </div>
+
+      <ng-template #nessunGiorno>
+        <div class="selected-day-empty">
+          Seleziona un giorno dal calendario.
+        </div>
+      </ng-template>
+
+    </aside>
+
+  </div>
+
+</section>

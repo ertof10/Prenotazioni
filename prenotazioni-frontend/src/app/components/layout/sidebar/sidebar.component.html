@@ -1,0 +1,89 @@
+<aside class="sidebar">
+
+  <div class="sidebar-brand">
+
+    <div class="brand-logo">
+      BP
+    </div>
+
+    <div>
+      <h2>BookingPro</h2>
+      <p>Enterprise Suite</p>
+    </div>
+
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <a [routerLink]="['/dashboard']" routerLinkActive="active-link">
+      <span class="nav-icon">🏠</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/utenti']" routerLinkActive="active-link">
+      <span class="nav-icon">👥</span>
+      <span>Clienti</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/collaboratori']" routerLinkActive="active-link">
+      <span class="nav-icon">🧑‍💼</span>
+      <span>Staff</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/servizi']" routerLinkActive="active-link">
+      <span class="nav-icon">✨</span>
+      <span>Servizi</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/prenotazioni']" routerLinkActive="active-link">
+      <span class="nav-icon">📅</span>
+      <span>Prenotazioni</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/preventivi']" routerLinkActive="active-link">
+      <span class="nav-icon">💶</span>
+      <span>Preventivi</span>
+    </a>
+
+    <a *ngIf="ruolo === 'ADMIN'" [routerLink]="['/calendario']" routerLinkActive="active-link">
+      <span class="nav-icon">🗓️</span>
+      <span>Calendario</span>
+    </a>
+
+    <a *ngIf="ruolo === 'UTENTE'" [routerLink]="['/servizi']" routerLinkActive="active-link">
+      <span class="nav-icon">✨</span>
+      <span>Servizi</span>
+    </a>
+
+    <a *ngIf="ruolo === 'UTENTE'" [routerLink]="['/prenotazioni']" routerLinkActive="active-link">
+      <span class="nav-icon">📅</span>
+      <span>Le mie prenotazioni</span>
+    </a>
+
+    <a *ngIf="ruolo === 'UTENTE'" [routerLink]="['/preventivi']" routerLinkActive="active-link">
+      <span class="nav-icon">💶</span>
+      <span>I miei preventivi</span>
+    </a>
+
+    <a *ngIf="ruolo === 'COLLABORATORE'" [routerLink]="['/prenotazioni']" routerLinkActive="active-link">
+      <span class="nav-icon">📅</span>
+      <span>Le mie prenotazioni</span>
+    </a>
+
+    <a *ngIf="ruolo === 'COLLABORATORE'" [routerLink]="['/calendario']" routerLinkActive="active-link">
+      <span class="nav-icon">🗓️</span>
+      <span>Il mio calendario</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-footer">
+
+    <button type="button" (click)="logout()">
+      <span class="nav-icon">🚪</span>
+      <span>Logout</span>
+    </button>
+
+  </div>
+
+</aside>
